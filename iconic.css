@@ -1,0 +1,113 @@
+/* A+ Works — Persian typography & iconic UI layer */
+:root{
+  --font-ui:'Inter',Arial,sans-serif;
+  --font-fa:'Estedad','Vazirmatn',Tahoma,Arial,sans-serif;
+  --icon-size:18px;
+}
+
+body,button,input,select,textarea{font-family:var(--font-ui)}
+html[dir=rtl] body,
+html[dir=rtl] button,
+html[dir=rtl] input,
+html[dir=rtl] select,
+html[dir=rtl] textarea{font-family:var(--font-fa)}
+
+html[dir=rtl] .hero h1,
+html[dir=rtl] .dh h2,
+html[dir=rtl] .copy b,
+html[dir=rtl] .pt b,
+html[dir=rtl] .tasktitle,
+html[dir=rtl] .metric b{
+  letter-spacing:0;
+  line-height:1.42;
+}
+html[dir=rtl] .hero p,
+html[dir=rtl] .copy small,
+html[dir=rtl] .pt small,
+html[dir=rtl] .taskmeta,
+html[dir=rtl] .sync small,
+html[dir=rtl] .bubble p{line-height:1.95}
+html[dir=rtl] .eyebrow{letter-spacing:.02em}
+
+.ui-svg{width:var(--icon-size);height:var(--icon-size);display:block;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.ui-svg.sm{width:14px;height:14px}
+.ui-svg.lg{width:24px;height:24px}
+
+.search{position:relative}
+.search .search-icon{display:grid;place-items:center;color:var(--p)}
+.search:focus-within{box-shadow:inset 4px 4px 9px rgba(163,174,190,.52),inset -4px -4px 9px rgba(255,255,255,.96),0 0 0 3px rgba(109,97,232,.08)}
+.icon{display:grid;place-items:center;transition:.18s ease}
+.icon:hover,.ext:hover,.close:hover{color:var(--p);transform:translateY(-1px)}
+.icon:active,.ext:active,.close:active{box-shadow:var(--inset);transform:none}
+
+.logo{position:relative;overflow:hidden}
+.logo:after{content:'';position:absolute;width:34px;height:34px;border:1px solid rgba(255,255,255,.22);border-radius:12px;transform:rotate(18deg)}
+
+.hero{position:relative;overflow:hidden}
+.hero:before{content:'';position:absolute;width:360px;height:360px;border-radius:50%;right:-160px;top:-210px;background:radial-gradient(circle,rgba(109,97,232,.12),transparent 68%);pointer-events:none}
+html[dir=rtl] .hero:before{right:auto;left:-160px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px}
+.eyebrow:before{content:'';width:8px;height:8px;border-radius:3px;background:var(--p);box-shadow:0 0 0 5px rgba(109,97,232,.1)}
+.sync strong{gap:10px}.sync-icon{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;color:var(--green);box-shadow:var(--shadow2);margin-inline-end:2px}.sync .dot{display:none}
+
+.metric{position:relative;overflow:hidden;padding-top:18px}
+.metric-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;color:var(--p);box-shadow:var(--shadow2);margin-bottom:18px}
+.metric:nth-child(2) .metric-icon{color:var(--cyan)}
+.metric:nth-child(3) .metric-icon{color:var(--amber)}
+.metric:nth-child(4) .metric-icon{color:var(--green)}
+.metric b{margin-top:7px}
+.metric:after{content:'';position:absolute;width:90px;height:90px;border-radius:50%;right:-42px;bottom:-50px;background:rgba(109,97,232,.045)}
+html[dir=rtl] .metric:after{right:auto;left:-42px}
+
+.chip{display:inline-flex;align-items:center;gap:7px}
+.chip .ui-svg{width:15px;height:15px}
+.chip.on{background:rgba(109,97,232,.045)}
+
+.avatar{font-size:0;background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 88%,#fff 12%),color-mix(in srgb,var(--accent) 70%,#273047 30%))}
+.avatar .ui-svg{width:25px;height:25px;stroke-width:1.8}
+.account{transition:transform .18s ease,box-shadow .18s ease}
+.account:hover{transform:translateY(-2px)}
+.summary{transition:background .18s ease}
+.summary:hover{background:rgba(255,255,255,.13)}
+.summary-caret{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;color:var(--muted);transition:.2s}
+.account.open .summary-caret{transform:rotate(180deg);color:var(--p)}
+
+.project{transition:transform .16s ease,box-shadow .16s ease}
+.project:hover{transform:translateY(-1px)}
+.pi{width:39px;height:39px;font-size:0;background:linear-gradient(145deg,rgba(129,117,243,.13),rgba(88,75,209,.035));box-shadow:var(--shadow2)}
+.pi .ui-svg{width:19px;height:19px;stroke-width:1.9}
+.status{display:inline-flex;align-items:center;gap:5px}
+.status .ui-svg{width:11px;height:11px;stroke-width:2.2}
+.ext{font-size:0}.ext .ui-svg{width:17px;height:17px}
+.project button>small{display:inline-flex;align-items:center;gap:5px}
+.project button>small:before{content:'';width:6px;height:6px;border-radius:50%;background:var(--rose);box-shadow:0 0 0 3px rgba(200,105,131,.09)}
+
+.primary,.secondary{display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:.18s ease}
+.primary:hover,.secondary:hover{transform:translateY(-1px)}
+.primary .ui-svg,.secondary .ui-svg{width:16px;height:16px}
+.close{display:grid;place-items:center;font-size:0}.close .ui-svg{width:20px;height:20px}
+.toolbar select{min-width:150px}
+.settings summary{display:flex;align-items:center;gap:8px;list-style:none}.settings summary::-webkit-details-marker{display:none}.settings summary:before{content:'';width:8px;height:8px;border:2px solid var(--p);border-radius:3px;transform:rotate(45deg)}
+.tasks h3{display:flex;align-items:center;gap:8px}.tasks h3:before{content:'';width:10px;height:10px;border-radius:4px;background:var(--p);box-shadow:0 0 0 5px rgba(109,97,232,.09)}
+.ctoggle{display:inline-flex;align-items:center;gap:6px}
+.ctoggle .ui-svg{width:15px;height:15px;color:var(--p)}
+
+.addproject{display:flex!important;align-items:center;justify-content:center;gap:9px!important;background:linear-gradient(145deg,#8175f3,#584bd1)!important;color:#fff!important;padding:13px 15px!important;box-shadow:8px 8px 18px rgba(126,116,170,.33),-7px -7px 16px rgba(255,255,255,.8)!important;transition:.18s ease!important}
+.addproject:hover{transform:translateY(-2px)!important;filter:saturate(1.08)}
+.addproject .ui-svg{width:17px;height:17px}
+
+.project-modal-head small{display:flex;align-items:center;gap:7px}
+.project-modal-head small:before{content:'';width:8px;height:8px;border-radius:50%;background:var(--p)}
+
+html[dir=rtl] .project-form input,
+html[dir=rtl] .project-form select,
+html[dir=rtl] .newtask input,
+html[dir=rtl] .commentform textarea,
+html[dir=rtl] .replyform input{text-align:right}
+
+@media(max-width:500px){
+  .metric-icon{width:36px;height:36px;margin-bottom:12px}
+  .metric-icon .ui-svg{width:19px;height:19px}
+  .avatar{width:48px;height:48px}
+  .project button>small:before{display:none}
+}
