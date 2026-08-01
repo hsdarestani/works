@@ -84,7 +84,7 @@ async function uploadAsset(request, env, db) {
   const uploadedBy = cleanName(form.get("uploaded_by"), "Unknown").slice(0, 80);
 
   if (!projectId) return json({ error: "A valid project_id is required." }, 400);
-  if (!file || typeof file.stream !== "function" || typeof file.size !== "number") {
+  if (!file || typeof file.arrayBuffer !== "function" || typeof file.size !== "number") {
     return json({ error: "A file is required." }, 400);
   }
   if (file.size <= 0) return json({ error: "The selected file is empty." }, 400);
@@ -101,7 +101,7 @@ async function uploadAsset(request, env, db) {
   const objectKey = `projects/${projectId}/${crypto.randomUUID()}-${safeObjectFilename(originalName)}`;
   const createdAt = new Date().toISOString();
 
-  await files.put(objectKey, file.stream(), {
+  await files.put(objectKey, file, {
     httpMetadata: { contentType },
     customMetadata: {
       projectId: String(projectId),
