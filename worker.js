@@ -29,7 +29,22 @@ function requireDb(env) {
   return env.DB;
 }
 
+async function ensureDefaultProjects(db) {
+  await db.prepare(`
+    INSERT OR IGNORE INTO projects (
+      id, account_id, title_de, title_fa, description_de, description_fa,
+      kind, status, url, progress, sort_order
+    ) VALUES (
+      106, 1, 'Business Card', 'کارت ویزیت',
+      'Konzeption, Gestaltung und Druckvorbereitung der A+ Solution Visitenkarte.',
+      'طراحی، نهایی‌سازی و آماده‌سازی چاپ کارت ویزیت A+ Solution.',
+      'design', 'in_progress', NULL, 50, 6
+    )
+  `).run();
+}
+
 async function bootstrap(db) {
+  await ensureDefaultProjects(db);
   const [accounts, projects, tasks, comments] = await Promise.all([
     db.prepare("SELECT * FROM accounts ORDER BY sort_order ASC, id ASC").all(),
     db.prepare("SELECT * FROM projects ORDER BY account_id ASC, sort_order ASC, id ASC").all(),
@@ -43,6 +58,78 @@ async function bootstrap(db) {
     tasks: tasks.results || [],
     comments: comments.results || []
   };
+}
+
+function validHttpUrl(value) {
+  if (!value) return true;
+  try {
+    const parsed = new URL(value);
+    return ["http:", "https:"].includes(parsed.protocol);
+  } catch {
+    return false;
+  }
+}
+
+async function createProject(db, body) {
+  const accountId = Number(body?.account_id);
+  const titleDe = String(body?.title_de || "").trim();
+  const titleFa = String(body?.title_fa || "").trim();
+  const kind = String(body?.kind || "internal").trim();
+  const status = String(body?.status || "planning").trim();
+  const allowedKinds = new Set(["design", "website", "seo", "redesign", "app", "product", "demo", "internal"]);
+  const allowedStatuses = new Set(["idea", "demo", "planning", "in_progress", "review", "live", "maintenance", "paused", "done"]);
+
+  if (!Number.isInteger(accountId) || accountId <= 0 || !titleDe) {
+    return json({ error: "account_id and title_de are required." }, 400);
+  }
+  if (titleDe.length > 160 || titleFa.length > 160) {
+    return json({ error: "Project title is too long." }, 400);
+  }
+  if (!allowedKinds.has(kind) || !allowedStatuses.has(status)) {
+    return json({ error: "Invalid project type or status." }, 400);
+  }
+
+  let url = body?.url === null || body?.url === undefined || String(body.url).trim() === ""
+    ? null
+    : String(body.url).trim();
+  if (url && (url.length > 500 || !validHttpUrl(url))) {
+    return json({ error: "URL must start with http:// or https://" }, 400);
+  }
+
+  let progress = Number(body?.progress || 0);
+  if (!Number.isFinite(progress)) progress = 0;
+  progress = Math.min(100, Math.max(0, Math.round(progress)));
+
+  const account = await db.prepare("SELECT id FROM accounts WHERE id = ?").bind(accountId).first();
+  if (!account) return json({ error: "Account not found." }, 404);
+
+  const orderRow = await db.prepare(
+    "SELECT COALESCE(MAX(sort_order), 0) AS max_order FROM projects WHERE account_id = ?"
+  ).bind(accountId).first();
+  const sortOrder = Number(orderRow?.max_order || 0) + 1;
+  const createdAt = new Date().toISOString();
+
+  const result = await db.prepare(`
+    INSERT INTO projects (
+      account_id, title_de, title_fa, description_de, description_fa,
+      kind, status, url, progress, sort_order, created_at
+    ) VALUES (?, ?, ?, '', '', ?, ?, ?, ?, ?, ?)
+  `).bind(accountId, titleDe, titleFa, kind, status, url, progress, sortOrder, createdAt).run();
+
+  return json({
+    id: result.meta?.last_row_id,
+    account_id: accountId,
+    title_de: titleDe,
+    title_fa: titleFa,
+    description_de: "",
+    description_fa: "",
+    kind,
+    status,
+    url,
+    progress,
+    sort_order: sortOrder,
+    created_at: createdAt
+  }, 201);
 }
 
 async function createTask(db, body) {
@@ -151,14 +238,8 @@ async function updateProject(db, projectId, body) {
 
   let url = body?.url === undefined ? existing.url : body.url;
   url = url === null || String(url).trim() === "" ? null : String(url).trim();
-  if (url && url.length > 500) return json({ error: "URL is too long." }, 400);
-  if (url) {
-    try {
-      const parsed = new URL(url);
-      if (!["http:", "https:"].includes(parsed.protocol)) throw new Error();
-    } catch {
-      return json({ error: "URL must start with http:// or https://" }, 400);
-    }
+  if (url && (url.length > 500 || !validHttpUrl(url))) {
+    return json({ error: "URL must start with http:// or https://" }, 400);
   }
 
   await db.prepare("UPDATE projects SET status = ?, progress = ?, url = ? WHERE id = ?")
@@ -181,6 +262,10 @@ async function handleApi(request, env, pathname) {
   if (request.method === "GET" && resource === "health") {
     await db.prepare("SELECT 1 AS ok").first();
     return json({ ok: true });
+  }
+
+  if (request.method === "POST" && resource === "projects" && !id) {
+    return createProject(db, await readJson(request));
   }
 
   if (request.method === "POST" && resource === "tasks" && !id) {
