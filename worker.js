@@ -1,3 +1,10 @@
+import {
+  ASSET_MAX_FILE_SIZE,
+  ensureAssetsTable,
+  handleAssetApi,
+  listAssets
+} from "./asset-api.js";
+
 const JSON_HEADERS = {
   "content-type": "application/json; charset=utf-8",
   "cache-control": "no-store"
@@ -43,20 +50,26 @@ async function ensureDefaultProjects(db) {
   `).run();
 }
 
-async function bootstrap(db) {
-  await ensureDefaultProjects(db);
-  const [accounts, projects, tasks, comments] = await Promise.all([
+async function bootstrap(db, env) {
+  await Promise.all([ensureDefaultProjects(db), ensureAssetsTable(db)]);
+  const [accounts, projects, tasks, comments, assets] = await Promise.all([
     db.prepare("SELECT * FROM accounts ORDER BY sort_order ASC, id ASC").all(),
     db.prepare("SELECT * FROM projects ORDER BY account_id ASC, sort_order ASC, id ASC").all(),
     db.prepare("SELECT * FROM tasks ORDER BY completed ASC, created_at DESC, id DESC").all(),
-    db.prepare("SELECT * FROM comments ORDER BY created_at ASC, id ASC").all()
+    db.prepare("SELECT * FROM comments ORDER BY created_at ASC, id ASC").all(),
+    listAssets(db)
   ]);
 
   return {
     accounts: accounts.results || [],
     projects: projects.results || [],
     tasks: tasks.results || [],
-    comments: comments.results || []
+    comments: comments.results || [],
+    assets,
+    storage: {
+      enabled: Boolean(env.FILES),
+      max_file_size: ASSET_MAX_FILE_SIZE
+    }
   };
 }
 
@@ -255,13 +268,17 @@ async function handleApi(request, env, pathname) {
   const segments = pathname.replace(/^\/api\/?/, "").split("/").filter(Boolean);
   const [resource, id] = segments;
 
+  if (resource === "assets") {
+    return handleAssetApi(request, env, db, segments);
+  }
+
   if (request.method === "GET" && resource === "bootstrap") {
-    return json(await bootstrap(db));
+    return json(await bootstrap(db, env));
   }
 
   if (request.method === "GET" && resource === "health") {
     await db.prepare("SELECT 1 AS ok").first();
-    return json({ ok: true });
+    return json({ ok: true, storage: Boolean(env.FILES) });
   }
 
   if (request.method === "POST" && resource === "projects" && !id) {
@@ -294,7 +311,7 @@ export default {
     if (request.method === "OPTIONS" && url.pathname.startsWith("/api/")) {
       return new Response(null, {
         status: 204,
-        headers: { allow: "GET, POST, PATCH, OPTIONS" }
+        headers: { allow: "GET, POST, PATCH, DELETE, OPTIONS" }
       });
     }
 
@@ -303,7 +320,10 @@ export default {
         return await handleApi(request, env, url.pathname);
       } catch (error) {
         console.error(error);
-        return json({ error: error.message || "Internal server error" }, error.status || 500);
+        return json(
+          { error: error.message || "Internal server error", code: error.code || "INTERNAL_ERROR" },
+          error.status || 500
+        );
       }
     }
 
