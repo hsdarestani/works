@@ -1,0 +1,8 @@
+worker.js
+wrangler.jsonc
+wrangler.example.toml
+schema.sql
+README.md
+functions/
+.git/
+.github/
