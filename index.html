@@ -5,7 +5,11 @@
   <meta content="width=device-width,initial-scale=1" name="viewport" />
   <meta content="#e9eef5" name="theme-color" />
   <title>A+ Works</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Estedad:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link href="./styles.css" rel="stylesheet" />
+  <link href="./iconic.css" rel="stylesheet" />
 </head>
 <body>
   <div class="shell">
@@ -18,7 +22,7 @@
       <div class="actions">
         <label class="author inset"><select id="author"><option>Hossein</option><option>Ashkan</option></select></label>
         <div class="lang"><button class="on" data-lang="de">DE</button><button data-lang="fa">FA</button></div>
-        <button class="icon" id="refresh">↻</button>
+        <button class="icon" id="refresh" aria-label="Refresh">↻</button>
       </div>
     </header>
 
@@ -61,11 +65,11 @@
     <section class="panel soft">
       <header class="dh">
         <div><small id="da"></small><h2 id="dt"></h2><p id="dd"></p></div>
-        <button class="close" data-close="">×</button>
+        <button class="close" data-close="" aria-label="Close">×</button>
       </header>
       <div class="toolbar inset">
         <select id="status"></select>
-        <a class="primary" data-t="openproject" id="plink" target="_blank">Projekt öffnen</a>
+        <a class="primary" data-t="openproject" id="plink" target="_blank" rel="noopener">Projekt öffnen</a>
       </div>
       <details class="settings soft">
         <summary data-t="edit">Projekt bearbeiten</summary>
@@ -97,5 +101,6 @@
   <script defer src="./links.js"></script>
   <script defer src="./app.js"></script>
   <script defer src="./project-manager.js"></script>
+  <script defer src="./icon-ui.js"></script>
 </body>
 </html>
