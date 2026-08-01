@@ -1,4 +1,6 @@
-const MAX_FILE_SIZE = 25 * 1024 * 1024;
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const DEFAULT_REPOSITORY = "hsdarestani/works";
+const DEFAULT_BRANCH = "main";
 
 const JSON_HEADERS = {
   "content-type": "application/json; charset=utf-8",
@@ -16,11 +18,38 @@ function httpError(message, status = 500, code = "ASSET_ERROR") {
   return error;
 }
 
-function requireFiles(env) {
-  if (!env.FILES) {
-    throw httpError("R2 binding 'FILES' is not configured.", 503, "R2_NOT_CONFIGURED");
+function requireGithubToken(env) {
+  if (!env.GITHUB_TOKEN) {
+    throw httpError(
+      "GitHub secret 'GITHUB_TOKEN' is not configured.",
+      503,
+      "GITHUB_TOKEN_NOT_CONFIGURED"
+    );
   }
-  return env.FILES;
+  return env.GITHUB_TOKEN;
+}
+
+function repositoryConfig(env) {
+  const repository = String(env.GITHUB_REPOSITORY || DEFAULT_REPOSITORY).trim();
+  const [owner, repo] = repository.split("/");
+  if (!owner || !repo) {
+    throw httpError("GITHUB_REPOSITORY must use owner/repository format.", 500, "INVALID_GITHUB_REPOSITORY");
+  }
+  return {
+    owner,
+    repo,
+    branch: String(env.GITHUB_BRANCH || DEFAULT_BRANCH).trim() || DEFAULT_BRANCH
+  };
+}
+
+function githubHeaders(env) {
+  return {
+    accept: "application/vnd.github+json",
+    authorization: `Bearer ${requireGithubToken(env)}`,
+    "content-type": "application/json",
+    "user-agent": "a-plus-works-cloudflare-worker",
+    "x-github-api-version": "2022-11-28"
+  };
 }
 
 function cleanName(value, fallback = "Asset") {
@@ -31,19 +60,69 @@ function cleanName(value, fallback = "Asset") {
   return result || fallback;
 }
 
-function safeObjectFilename(filename) {
-  const cleaned = String(filename || "file")
+function safeFilename(filename) {
+  const value = String(filename || "file").trim();
+  const extensionMatch = value.match(/(\.[a-zA-Z0-9]{1,12})$/);
+  const extension = extensionMatch ? extensionMatch[1].toLowerCase() : "";
+  const stem = extension ? value.slice(0, -extension.length) : value;
+  const cleanedStem = stem
     .normalize("NFKD")
     .replace(/[^a-zA-Z0-9._-]+/g, "-")
     .replace(/-+/g, "-")
     .replace(/^[-.]+|[-.]+$/g, "")
-    .slice(0, 120);
-  return cleaned || "file";
+    .slice(0, 90);
+  return `${cleanedStem || "file"}${extension}`;
+}
+
+function encodeRepoPath(path) {
+  return String(path).split("/").map(encodeURIComponent).join("/");
 }
 
 function validAssetId(value) {
   const id = Number(value);
   return Number.isInteger(id) && id > 0 ? id : null;
+}
+
+function arrayBufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  const chunkSize = 0x8000;
+  let binary = "";
+  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
+  }
+  return btoa(binary);
+}
+
+async function githubRequest(env, method, path, body) {
+  const { owner, repo } = repositoryConfig(env);
+  const response = await fetch(
+    `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${encodeRepoPath(path)}`,
+    {
+      method,
+      headers: githubHeaders(env),
+      body: body === undefined ? undefined : JSON.stringify(body)
+    }
+  );
+
+  if (response.ok) return response.status === 204 ? null : response.json();
+
+  const details = await response.json().catch(() => ({}));
+  const message = details.message || `GitHub API returned ${response.status}.`;
+  const code = response.status === 401 || response.status === 403
+    ? "GITHUB_TOKEN_INVALID"
+    : response.status === 404
+      ? "GITHUB_FILE_NOT_FOUND"
+      : "GITHUB_API_ERROR";
+  throw httpError(message, response.status, code);
+}
+
+async function getGithubFile(env, path) {
+  try {
+    return await githubRequest(env, "GET", path);
+  } catch (error) {
+    if (error.code === "GITHUB_FILE_NOT_FOUND") return null;
+    throw error;
+  }
 }
 
 export async function ensureAssetsTable(db) {
@@ -77,7 +156,8 @@ export async function listAssets(db) {
 }
 
 async function uploadAsset(request, env, db) {
-  const files = requireFiles(env);
+  requireGithubToken(env);
+  const { branch } = repositoryConfig(env);
   const form = await request.formData();
   const projectId = validAssetId(form.get("project_id"));
   const file = form.get("file");
@@ -89,7 +169,7 @@ async function uploadAsset(request, env, db) {
   }
   if (file.size <= 0) return json({ error: "The selected file is empty." }, 400);
   if (file.size > MAX_FILE_SIZE) {
-    return json({ error: "The file is larger than 25 MB.", code: "FILE_TOO_LARGE" }, 413);
+    return json({ error: "The file is larger than 10 MB.", code: "FILE_TOO_LARGE" }, 413);
   }
 
   const project = await db.prepare("SELECT id FROM projects WHERE id = ?").bind(projectId).first();
@@ -98,17 +178,15 @@ async function uploadAsset(request, env, db) {
   const originalName = cleanName(file.name, "file").slice(0, 240);
   const assetName = cleanName(form.get("name"), originalName).slice(0, 160);
   const contentType = cleanName(file.type, "application/octet-stream").slice(0, 160);
-  const objectKey = `projects/${projectId}/${crypto.randomUUID()}-${safeObjectFilename(originalName)}`;
+  const uniquePart = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
+  const objectKey = `project-assets/${projectId}/${uniquePart}-${safeFilename(originalName)}`;
   const createdAt = new Date().toISOString();
+  const content = arrayBufferToBase64(await file.arrayBuffer());
 
-  await files.put(objectKey, file, {
-    httpMetadata: { contentType },
-    customMetadata: {
-      projectId: String(projectId),
-      assetName,
-      originalName,
-      uploadedBy
-    }
+  await githubRequest(env, "PUT", objectKey, {
+    message: `Upload asset for project ${projectId}: ${assetName}`,
+    content,
+    branch
   });
 
   try {
@@ -139,7 +217,14 @@ async function uploadAsset(request, env, db) {
       created_at: createdAt
     }, 201);
   } catch (error) {
-    await files.delete(objectKey).catch(() => {});
+    const remote = await getGithubFile(env, objectKey).catch(() => null);
+    if (remote?.sha) {
+      await githubRequest(env, "DELETE", objectKey, {
+        message: `Rollback asset upload for project ${projectId}`,
+        sha: remote.sha,
+        branch
+      }).catch(() => {});
+    }
     throw error;
   }
 }
@@ -157,35 +242,43 @@ async function renameAsset(request, db, assetId) {
 }
 
 async function deleteAsset(env, db, assetId) {
-  const files = requireFiles(env);
+  requireGithubToken(env);
+  const { branch } = repositoryConfig(env);
   const existing = await db.prepare("SELECT * FROM project_assets WHERE id = ?").bind(assetId).first();
   if (!existing) return json({ error: "Asset not found." }, 404);
 
-  await files.delete(existing.object_key);
+  const remote = await getGithubFile(env, existing.object_key);
+  if (remote?.sha) {
+    await githubRequest(env, "DELETE", existing.object_key, {
+      message: `Delete asset from project ${existing.project_id}: ${existing.name}`,
+      sha: remote.sha,
+      branch
+    });
+  }
+
   await db.prepare("DELETE FROM project_assets WHERE id = ?").bind(assetId).run();
   return json({ ok: true, id: assetId });
 }
 
 async function downloadAsset(env, db, assetId) {
-  const files = requireFiles(env);
   const asset = await db.prepare("SELECT * FROM project_assets WHERE id = ?").bind(assetId).first();
   if (!asset) return json({ error: "Asset not found." }, 404);
 
-  const object = await files.get(asset.object_key);
-  if (!object) return json({ error: "Stored file not found." }, 404);
+  const { owner, repo, branch } = repositoryConfig(env);
+  const rawUrl = `https://raw.githubusercontent.com/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/${encodeURIComponent(branch)}/${encodeRepoPath(asset.object_key)}`;
+  const remote = await fetch(rawUrl, { headers: { "user-agent": "a-plus-works-cloudflare-worker" } });
+  if (!remote.ok || !remote.body) return json({ error: "Stored file not found." }, 404);
 
   const headers = new Headers();
-  object.writeHttpMetadata(headers);
-  headers.set("content-type", asset.content_type || "application/octet-stream");
-  headers.set("content-length", String(asset.size || object.size || 0));
+  headers.set("content-type", asset.content_type || remote.headers.get("content-type") || "application/octet-stream");
+  headers.set("content-length", String(asset.size || remote.headers.get("content-length") || 0));
   headers.set("cache-control", "private, no-store");
-  headers.set("etag", object.httpEtag);
   headers.set(
     "content-disposition",
     `attachment; filename*=UTF-8''${encodeURIComponent(asset.original_name || asset.name || "download")}`
   );
 
-  return new Response(object.body, { headers });
+  return new Response(remote.body, { headers });
 }
 
 export async function handleAssetApi(request, env, db, segments) {
