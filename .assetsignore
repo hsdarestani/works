@@ -6,5 +6,6 @@ schema.sql
 README.md
 migrations/
 functions/
+project-assets/
 .git/
 .github/
