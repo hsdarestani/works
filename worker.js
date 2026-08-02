@@ -1,8 +1,7 @@
 import {
   ASSET_MAX_FILE_SIZE,
   ensureAssetsTable,
-  handleAssetApi,
-  listAssets
+  handleAssetApi
 } from "./asset-api.js";
 
 const JSON_HEADERS = {
@@ -51,13 +50,17 @@ async function ensureDefaultProjects(db) {
 }
 
 async function bootstrap(db, env) {
-  await Promise.all([ensureDefaultProjects(db), ensureAssetsTable(db)]);
-  const [accounts, projects, tasks, comments, assets] = await Promise.all([
-    db.prepare("SELECT * FROM accounts ORDER BY sort_order ASC, id ASC").all(),
-    db.prepare("SELECT * FROM projects ORDER BY account_id ASC, sort_order ASC, id ASC").all(),
-    db.prepare("SELECT * FROM tasks ORDER BY completed ASC, created_at DESC, id DESC").all(),
-    db.prepare("SELECT * FROM comments ORDER BY created_at ASC, id ASC").all(),
-    listAssets(db)
+  // D1 writes must run sequentially. Running schema writes and reads together
+  // could leave the request pending after the assets table was introduced.
+  await ensureDefaultProjects(db);
+  await ensureAssetsTable(db);
+
+  const [accounts, projects, tasks, comments, assets] = await db.batch([
+    db.prepare("SELECT * FROM accounts ORDER BY sort_order ASC, id ASC"),
+    db.prepare("SELECT * FROM projects ORDER BY account_id ASC, sort_order ASC, id ASC"),
+    db.prepare("SELECT * FROM tasks ORDER BY completed ASC, created_at DESC, id DESC"),
+    db.prepare("SELECT * FROM comments ORDER BY created_at ASC, id ASC"),
+    db.prepare("SELECT * FROM project_assets ORDER BY created_at DESC, id DESC")
   ]);
 
   return {
@@ -65,9 +68,10 @@ async function bootstrap(db, env) {
     projects: projects.results || [],
     tasks: tasks.results || [],
     comments: comments.results || [],
-    assets,
+    assets: assets.results || [],
     storage: {
-      enabled: Boolean(env.FILES),
+      enabled: Boolean(env.GITHUB_TOKEN),
+      provider: "github",
       max_file_size: ASSET_MAX_FILE_SIZE
     }
   };
@@ -77,7 +81,7 @@ function validHttpUrl(value) {
   if (!value) return true;
   try {
     const parsed = new URL(value);
-    return ["http:", "https:"].includes(parsed.protocol);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
   } catch {
     return false;
   }
@@ -102,9 +106,7 @@ async function createProject(db, body) {
     return json({ error: "Invalid project type or status." }, 400);
   }
 
-  let url = body?.url === null || body?.url === undefined || String(body.url).trim() === ""
-    ? null
-    : String(body.url).trim();
+  let url = body?.url == null || String(body.url).trim() === "" ? null : String(body.url).trim();
   if (url && (url.length > 500 || !validHttpUrl(url))) {
     return json({ error: "URL must start with http:// or https://" }, 400);
   }
@@ -186,15 +188,14 @@ async function updateTask(db, taskId, body) {
   const title = body?.title === undefined ? existing.title : String(body.title || "").trim();
   if (!title || title.length > 240) return json({ error: "Invalid task title." }, 400);
 
-  await db.prepare("UPDATE tasks SET title = ?, completed = ? WHERE id = ?").bind(title, completed, id).run();
+  await db.prepare("UPDATE tasks SET title = ?, completed = ? WHERE id = ?")
+    .bind(title, completed, id).run();
   return json({ ...existing, title, completed });
 }
 
 async function createComment(db, body) {
   const taskId = Number(body?.task_id);
-  const parentId = body?.parent_id === null || body?.parent_id === undefined || body?.parent_id === ""
-    ? null
-    : Number(body.parent_id);
+  const parentId = body?.parent_id == null || body?.parent_id === "" ? null : Number(body.parent_id);
   const author = String(body?.author || "").trim() || "Unknown";
   const commentBody = String(body?.body || "").trim();
 
@@ -250,7 +251,7 @@ async function updateProject(db, projectId, body) {
   progress = Math.min(100, Math.max(0, Math.round(progress)));
 
   let url = body?.url === undefined ? existing.url : body.url;
-  url = url === null || String(url).trim() === "" ? null : String(url).trim();
+  url = url == null || String(url).trim() === "" ? null : String(url).trim();
   if (url && (url.length > 500 || !validHttpUrl(url))) {
     return json({ error: "URL must start with http:// or https://" }, 400);
   }
@@ -278,25 +279,25 @@ async function handleApi(request, env, pathname) {
 
   if (request.method === "GET" && resource === "health") {
     await db.prepare("SELECT 1 AS ok").first();
-    return json({ ok: true, storage: Boolean(env.FILES) });
+    return json({
+      ok: true,
+      storage: Boolean(env.GITHUB_TOKEN),
+      provider: "github"
+    });
   }
 
   if (request.method === "POST" && resource === "projects" && !id) {
     return createProject(db, await readJson(request));
   }
-
   if (request.method === "POST" && resource === "tasks" && !id) {
     return createTask(db, await readJson(request));
   }
-
   if (request.method === "PATCH" && resource === "tasks" && id) {
     return updateTask(db, id, await readJson(request));
   }
-
   if (request.method === "POST" && resource === "comments" && !id) {
     return createComment(db, await readJson(request));
   }
-
   if (request.method === "PATCH" && resource === "projects" && id) {
     return updateProject(db, id, await readJson(request));
   }
