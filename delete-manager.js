@@ -1,4 +1,4 @@
-/* A+ Works — delete duplicate accounts or projects safely */
+/* A+ Works — safe account and project deletion without overlapping counters */
 (() => {
   Object.assign(L.de, {
     deleteAccount: 'Akte löschen',
@@ -20,38 +20,43 @@
 
   const style = document.createElement('style');
   style.textContent = `
-    .account,.project{position:relative}
+    body.simple-mode .summary{
+      grid-template-columns:auto minmax(0,1fr) auto auto auto!important;
+    }
+    body.simple-mode .project{
+      grid-template-columns:minmax(0,1fr) auto auto!important;
+      align-items:center;
+    }
     .delete-account,.delete-project{
-      position:absolute;
-      z-index:6;
+      position:static!important;
+      inset:auto!important;
+      transform:none!important;
       width:30px;
       height:30px;
+      flex:0 0 30px;
       border:0;
       border-radius:9px;
       display:grid;
       place-items:center;
-      color:#a04c55;
-      background:#fff4f5;
+      color:#9f5961;
+      background:#fff1f2;
       cursor:pointer;
-      opacity:.6;
+      opacity:.72;
       transition:.18s ease;
     }
     .delete-account:hover,.delete-project:hover{
       opacity:1;
       color:#fff;
       background:#c65360;
-      transform:scale(1.04);
+      transform:scale(1.04)!important;
     }
-    .delete-account{top:19px;right:54px}
-    .delete-project{top:50%;right:43px;transform:translateY(-50%)}
-    .delete-project:hover{transform:translateY(-50%) scale(1.04)}
-    html[dir=rtl] .delete-account{right:auto;left:54px}
-    html[dir=rtl] .delete-project{right:auto;left:43px}
-    .delete-account svg,.delete-project svg{width:15px;height:15px}
-    @media(max-width:760px){
-      .delete-account,.delete-project{opacity:1}
-      .delete-account{right:48px}
-      html[dir=rtl] .delete-account{right:auto;left:48px}
+    .delete-account svg,.delete-project svg{width:14px;height:14px}
+    @media(max-width:500px){
+      body.simple-mode .summary{
+        grid-template-columns:auto minmax(0,1fr) auto auto!important;
+      }
+      body.simple-mode .summary .badge{display:none!important}
+      .delete-account,.delete-project{opacity:1;width:29px;height:29px}
     }
   `;
   document.head.append(style);
@@ -98,9 +103,7 @@
   async function deleteProject(project) {
     if (!window.confirm(tr('confirmDeleteProject'))) return;
     try {
-      if (S.mode === 'remote') {
-        await api(`projects/${project.id}`, { method: 'DELETE' });
-      }
+      if (S.mode === 'remote') await api(`projects/${project.id}`, { method: 'DELETE' });
       removeProjectFromState(project.id);
       if (S.mode === 'local') save();
       render();
@@ -113,9 +116,7 @@
   async function deleteAccount(account) {
     if (!window.confirm(tr('confirmDeleteAccount'))) return;
     try {
-      if (S.mode === 'remote') {
-        await api(`accounts/${account.id}`, { method: 'DELETE' });
-      }
+      if (S.mode === 'remote') await api(`accounts/${account.id}`, { method: 'DELETE' });
       removeAccountFromState(account.id);
       if (S.mode === 'local') save();
       render();
@@ -123,6 +124,21 @@
     } catch (error) {
       toast(error.message || tr('err'));
     }
+  }
+
+  function makeDeleteButton(className, label, handler) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = className;
+    button.innerHTML = trashIcon();
+    button.title = label;
+    button.setAttribute('aria-label', label);
+    button.onclick = event => {
+      event.preventDefault();
+      event.stopPropagation();
+      handler();
+    };
+    return button;
   }
 
   function addDeleteControls() {
@@ -133,19 +149,11 @@
       const account = accounts[accountIndex];
       if (!account) return;
 
-      if (!card.querySelector('.delete-account')) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'delete-account';
-        button.innerHTML = trashIcon();
-        button.title = tr('deleteAccount');
-        button.setAttribute('aria-label', tr('deleteAccount'));
-        button.onclick = event => {
-          event.preventDefault();
-          event.stopPropagation();
-          deleteAccount(account);
-        };
-        card.append(button);
+      const summary = card.querySelector('.summary');
+      if (summary && !summary.querySelector('.delete-account')) {
+        const button = makeDeleteButton('delete-account', tr('deleteAccount'), () => deleteAccount(account));
+        const caret = summary.lastElementChild;
+        summary.insertBefore(button, caret || null);
       }
 
       const projects = S.data.projects
@@ -155,18 +163,7 @@
       card.querySelectorAll('.project').forEach((row, projectIndex) => {
         const project = projects[projectIndex];
         if (!project || row.querySelector('.delete-project')) return;
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'delete-project';
-        button.innerHTML = trashIcon();
-        button.title = tr('deleteProject');
-        button.setAttribute('aria-label', tr('deleteProject'));
-        button.onclick = event => {
-          event.preventDefault();
-          event.stopPropagation();
-          deleteProject(project);
-        };
-        row.append(button);
+        row.append(makeDeleteButton('delete-project', tr('deleteProject'), () => deleteProject(project)));
       });
     });
   }
