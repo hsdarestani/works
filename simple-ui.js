@@ -27,6 +27,9 @@
 
   let currentTab = 'tasks';
 
+  /* Keep the dashboard clean when it first opens. Search results still open automatically. */
+  S.open.clear();
+
   function icon(name) {
     return typeof uiIcon === 'function' ? uiIcon(name) : '';
   }
@@ -113,24 +116,7 @@
     return true;
   }
 
-  function simplifyGrid() {
-    if (!S.data) return;
-    visible().forEach(account => S.open.add(+account.id));
-    document.querySelectorAll('.account').forEach(card => {
-      card.classList.add('open');
-      const summary = card.querySelector('.summary');
-      if (summary) summary.onclick = event => event.preventDefault();
-    });
-  }
-
   addGuide();
-
-  const originalRenderGrid = renderGrid;
-  renderGrid = function () {
-    if (S.data) visible().forEach(account => S.open.add(+account.id));
-    originalRenderGrid();
-    simplifyGrid();
-  };
 
   const originalRenderDrawer = renderDrawer;
   renderDrawer = function () {
@@ -157,21 +143,19 @@
   render = function () {
     originalRender();
     addGuide();
-    simplifyGrid();
     buildProjectTabs();
     updateSimpleTexts();
   };
 
   const observer = new MutationObserver(() => {
     buildProjectTabs();
-    simplifyGrid();
   });
   observer.observe(document.body, { childList: true, subtree: true });
 
   [0, 200, 600, 1400].forEach(delay => setTimeout(() => {
     addGuide();
-    simplifyGrid();
     buildProjectTabs();
     updateSimpleTexts();
+    if (S.data && delay === 0) renderGrid();
   }, delay));
 })();
