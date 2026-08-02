@@ -21,6 +21,11 @@ function authorized(request, env) {
   return !env.APP_PASSWORD || request.headers.get("x-app-password") === env.APP_PASSWORD;
 }
 
+function requireDb(env) {
+  if (!env.DB) return null;
+  return env.DB;
+}
+
 function validHttpUrl(value) {
   if (!value) return true;
   try {
@@ -40,31 +45,10 @@ function slugify(value) {
     .slice(0, 70) || `account-${Date.now()}`;
 }
 
-async function ensureBrooPerformance(db) {
-  await db.prepare(`
-    INSERT OR IGNORE INTO accounts (
-      id, slug, name, name_fa, type, website_url, accent, sort_order
-    ) VALUES (
-      25, 'broo-performance', 'Broo Performance', 'Broo Performance',
-      'website_client', 'https://broo-performance.pages.dev/', '#d85b45', 25
-    )
-  `).run();
-
-  await db.prepare(`
-    INSERT OR IGNORE INTO projects (
-      id, account_id, title_de, title_fa, description_de, description_fa,
-      kind, status, url, progress, sort_order
-    ) VALUES (
-      416, 25, 'Website Demo', 'دموی وب‌سایت',
-      'Website-Demo für Broo Performance.', 'دموی وب‌سایت Broo Performance.',
-      'demo', 'in_progress', 'https://broo-performance.pages.dev/', 20, 1
-    )
-  `).run();
-}
-
 async function createAccount(request, env) {
   if (!authorized(request, env)) return json({ error: "Unauthorized" }, 401);
-  if (!env.DB) return json({ error: "D1 binding 'DB' is not configured." }, 503);
+  const db = requireDb(env);
+  if (!db) return json({ error: "D1 binding 'DB' is not configured." }, 503);
 
   const body = await request.json().catch(() => null);
   const name = String(body?.name || "").trim();
@@ -78,15 +62,15 @@ async function createAccount(request, env) {
     return json({ error: "URL must start with http:// or https://" }, 400);
   }
 
-  const idRow = await env.DB.prepare("SELECT COALESCE(MAX(id), 0) + 1 AS next_id FROM accounts").first();
-  const orderRow = await env.DB.prepare("SELECT COALESCE(MAX(sort_order), 0) + 1 AS next_order FROM accounts").first();
+  const idRow = await db.prepare("SELECT COALESCE(MAX(id), 0) + 1 AS next_id FROM accounts").first();
+  const orderRow = await db.prepare("SELECT COALESCE(MAX(sort_order), 0) + 1 AS next_order FROM accounts").first();
   const id = Number(idRow?.next_id || Date.now());
   const sortOrder = Number(orderRow?.next_order || id);
   const slug = `${slugify(name)}-${id}`;
   const accent = type === "app_client" ? "#557fc4" : type === "demo" ? "#8a68c1" : "#d06a4f";
   const createdAt = new Date().toISOString();
 
-  await env.DB.prepare(`
+  await db.prepare(`
     INSERT INTO accounts (
       id, slug, name, name_fa, type, website_url, accent, sort_order, created_at
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -105,20 +89,69 @@ async function createAccount(request, env) {
   }, 201);
 }
 
+async function deleteProject(request, env, projectId) {
+  if (!authorized(request, env)) return json({ error: "Unauthorized" }, 401);
+  const db = requireDb(env);
+  if (!db) return json({ error: "D1 binding 'DB' is not configured." }, 503);
+
+  const id = Number(projectId);
+  if (!Number.isInteger(id) || id <= 0) return json({ error: "Invalid project id." }, 400);
+  const existing = await db.prepare("SELECT id FROM projects WHERE id = ?").bind(id).first();
+  if (!existing) return json({ error: "Project not found." }, 404);
+
+  await db.batch([
+    db.prepare("DELETE FROM comments WHERE task_id IN (SELECT id FROM tasks WHERE project_id = ?)").bind(id),
+    db.prepare("DELETE FROM tasks WHERE project_id = ?").bind(id),
+    db.prepare("DELETE FROM project_assets WHERE project_id = ?").bind(id),
+    db.prepare("DELETE FROM projects WHERE id = ?").bind(id)
+  ]);
+
+  return json({ ok: true, id });
+}
+
+async function deleteAccount(request, env, accountId) {
+  if (!authorized(request, env)) return json({ error: "Unauthorized" }, 401);
+  const db = requireDb(env);
+  if (!db) return json({ error: "D1 binding 'DB' is not configured." }, 503);
+
+  const id = Number(accountId);
+  if (!Number.isInteger(id) || id <= 0) return json({ error: "Invalid account id." }, 400);
+  const existing = await db.prepare("SELECT id FROM accounts WHERE id = ?").bind(id).first();
+  if (!existing) return json({ error: "Account not found." }, 404);
+
+  await db.batch([
+    db.prepare(`
+      DELETE FROM comments
+      WHERE task_id IN (
+        SELECT id FROM tasks
+        WHERE project_id IN (SELECT id FROM projects WHERE account_id = ?)
+      )
+    `).bind(id),
+    db.prepare("DELETE FROM tasks WHERE project_id IN (SELECT id FROM projects WHERE account_id = ?)").bind(id),
+    db.prepare("DELETE FROM project_assets WHERE project_id IN (SELECT id FROM projects WHERE account_id = ?)").bind(id),
+    db.prepare("DELETE FROM projects WHERE account_id = ?").bind(id),
+    db.prepare("DELETE FROM accounts WHERE id = ?").bind(id)
+  ]);
+
+  return json({ ok: true, id });
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    const accountMatch = url.pathname.match(/^\/api\/accounts\/(\d+)$/);
+    const projectMatch = url.pathname.match(/^\/api\/projects\/(\d+)$/);
 
     if (url.pathname === "/api/accounts" && request.method === "POST") {
       return createAccount(request, env);
     }
 
-    if (url.pathname === "/api/bootstrap" && env.DB) {
-      try {
-        await ensureBrooPerformance(env.DB);
-      } catch (error) {
-        console.error("Broo seed failed", error);
-      }
+    if (accountMatch && request.method === "DELETE") {
+      return deleteAccount(request, env, accountMatch[1]);
+    }
+
+    if (projectMatch && request.method === "DELETE") {
+      return deleteProject(request, env, projectMatch[1]);
     }
 
     return baseWorker.fetch(request, env, ctx);
