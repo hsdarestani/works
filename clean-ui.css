@@ -1,0 +1,158 @@
+/* Final cleanup: keep only the controls used every day */
+body.simple-mode .author,
+body.simple-mode .sync,
+body.simple-mode .eyebrow,
+body.simple-mode .hero p,
+body.simple-mode .simple-guide,
+body.simple-mode .brand small{
+  display:none!important;
+}
+
+body.simple-mode .top{
+  grid-template-columns:220px 1fr auto;
+}
+
+body.simple-mode .actions{
+  gap:8px;
+}
+
+body.simple-mode .hero{
+  grid-template-columns:1fr!important;
+  padding:22px 28px;
+}
+
+body.simple-mode .hero h1{
+  margin:0;
+  font-size:clamp(27px,3.5vw,40px);
+}
+
+body.simple-mode .metrics{
+  margin-top:12px;
+}
+
+body.simple-mode .filters{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+body.simple-mode .filters .chips{
+  flex:1;
+}
+
+.new-account-button{
+  border:0;
+  border-radius:12px;
+  padding:9px 13px;
+  min-height:39px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  white-space:nowrap;
+  background:#6559df;
+  color:#fff;
+  font:inherit;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.new-account-button b{
+  font-size:17px;
+  line-height:1;
+}
+
+.account-modal{
+  position:fixed;
+  inset:0;
+  z-index:500;
+  display:grid;
+  place-items:center;
+  padding:16px;
+}
+
+.account-modal[hidden]{display:none}
+.account-modal-back{
+  position:absolute;
+  inset:0;
+  background:rgba(24,31,48,.35);
+  backdrop-filter:blur(7px);
+}
+
+.account-modal-box{
+  position:relative;
+  width:min(470px,100%);
+  background:#f4f6fa;
+  border:1px solid rgba(255,255,255,.85);
+  border-radius:22px;
+  box-shadow:0 24px 70px rgba(31,41,59,.24);
+  padding:20px;
+}
+
+.account-modal-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:16px;
+}
+
+.account-modal-head h2{
+  margin:0;
+  font-size:24px;
+}
+
+.account-form{
+  display:grid;
+  gap:12px;
+}
+
+.account-form label{
+  display:grid;
+  gap:6px;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:750;
+}
+
+.account-form input,
+.account-form select{
+  width:100%;
+  border:1px solid rgba(103,113,137,.13);
+  background:#fff;
+  color:var(--ink);
+  border-radius:12px;
+  padding:12px;
+  outline:0;
+  font:inherit;
+}
+
+.account-form-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:9px;
+  margin-top:4px;
+}
+
+.account-form-actions button{
+  width:auto;
+}
+
+@media(max-width:760px){
+  body.simple-mode .top{
+    grid-template-columns:1fr auto;
+  }
+  body.simple-mode .filters{
+    align-items:stretch;
+    flex-direction:column;
+  }
+  .new-account-button{
+    width:100%;
+  }
+  .account-form-actions{
+    flex-direction:column-reverse;
+  }
+  .account-form-actions button{
+    width:100%;
+  }
+}
