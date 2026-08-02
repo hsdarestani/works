@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "works",
-  "main": "task-delete-worker.js",
+  "main": "translation-worker.js",
   "compatibility_date": "2026-08-01",
   "assets": {
     "directory": ".",
@@ -15,6 +15,9 @@
       "database_id": "cccba219-9ba8-4b4e-939e-7e46e66957d8"
     }
   ],
+  "ai": {
+    "binding": "AI"
+  },
   "vars": {
     "GITHUB_REPOSITORY": "hsdarestani/works",
     "GITHUB_BRANCH": "assets"
