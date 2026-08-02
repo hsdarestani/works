@@ -1,0 +1,77 @@
+/* A+ Works — simplified, understandable interface */
+body.simple-mode{--bg:#eef2f7;--ink:#1f293b;--muted:#748096;--p:#6559df;background:var(--bg)}
+body.simple-mode .shell{width:min(1240px,calc(100% - 28px));padding-bottom:52px}
+body.simple-mode .top{position:relative;top:auto;grid-template-columns:230px 1fr auto;border-radius:22px;padding:12px 14px;box-shadow:0 12px 34px rgba(67,78,102,.12);border:1px solid rgba(255,255,255,.75)}
+body.simple-mode .logo{width:46px;height:46px;border-radius:14px;box-shadow:none}
+body.simple-mode .search{height:46px;box-shadow:inset 0 0 0 1px rgba(103,113,137,.14);background:#f8fafc}
+body.simple-mode .author,body.simple-mode .lang,body.simple-mode .icon{box-shadow:none;border:1px solid rgba(103,113,137,.14);background:#f8fafc}
+body.simple-mode .hero{margin-top:18px;border-radius:24px;padding:26px 30px;grid-template-columns:1fr auto;box-shadow:0 12px 34px rgba(67,78,102,.09);background:linear-gradient(135deg,#fafbff,#f2f4fb);border:1px solid rgba(255,255,255,.9)}
+body.simple-mode .hero:before{display:none}
+body.simple-mode .hero h1{font-size:clamp(28px,4vw,44px);letter-spacing:-.045em;margin:7px 0 8px}
+body.simple-mode .hero p{font-size:14px;margin:0;max-width:650px}
+body.simple-mode .sync{min-height:auto;padding:13px 16px;border-radius:16px;box-shadow:none;background:#fff;border:1px solid rgba(103,113,137,.12)}
+body.simple-mode .sync-icon{width:30px;height:30px;border-radius:10px;box-shadow:none;background:#ecf9f4}
+.simple-guide{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.simple-guide-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:15px;background:#fff;border:1px solid rgba(103,113,137,.12);color:var(--muted);font-size:13px;font-weight:700}
+.simple-guide-item b{width:27px;height:27px;border-radius:9px;display:grid;place-items:center;background:rgba(101,89,223,.1);color:var(--p);font-size:12px}
+body.simple-mode .metrics{grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+body.simple-mode .metric{min-height:76px;border-radius:16px;padding:13px 15px;box-shadow:none;background:#fff;border:1px solid rgba(103,113,137,.12);display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:10px}
+body.simple-mode .metric-icon{width:34px;height:34px;border-radius:11px;box-shadow:none;margin:0;grid-row:1/3;background:#f4f2ff}
+body.simple-mode .metric>span{align-self:end}
+body.simple-mode .metric>b{font-size:24px;margin:0;grid-column:2;grid-row:2;line-height:1}
+body.simple-mode .metric>small{display:none}
+body.simple-mode .metric:after{display:none}
+body.simple-mode .filters{margin-top:14px;border-radius:17px;padding:8px 10px;box-shadow:none;background:#fff;border:1px solid rgba(103,113,137,.12)}
+body.simple-mode .chip{padding:9px 11px;border-radius:10px;font-size:13px}
+body.simple-mode .chip.on{box-shadow:none;background:#eeecff;color:var(--p)}
+body.simple-mode .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}
+body.simple-mode .account{border-radius:18px;box-shadow:none;background:#fff;border:1px solid rgba(103,113,137,.14);overflow:visible}
+body.simple-mode .account:hover{transform:none}
+body.simple-mode .summary{padding:14px;cursor:default;border-bottom:1px solid rgba(103,113,137,.1)}
+body.simple-mode .summary:hover{background:transparent}
+body.simple-mode .avatar{width:44px;height:44px;border-radius:13px;box-shadow:none}
+body.simple-mode .copy b{font-size:15px}
+body.simple-mode .copy small{font-size:11px}
+body.simple-mode .summary-caret{display:none}
+body.simple-mode .badge{box-shadow:none;background:#f1f3f7;color:var(--muted);border:1px solid rgba(103,113,137,.1)}
+body.simple-mode .projects,body.simple-mode .account.open .projects{max-height:none;opacity:1;overflow:visible;padding:10px 11px 12px;gap:7px}
+body.simple-mode .project{border-radius:13px;padding:6px;box-shadow:none;background:#f7f8fb;border:1px solid rgba(103,113,137,.1)}
+body.simple-mode .project:hover{transform:none;background:#f2f1ff;border-color:rgba(101,89,223,.2)}
+body.simple-mode .project button{grid-template-columns:auto 1fr auto;gap:8px}
+body.simple-mode .pi{width:34px;height:34px;border-radius:10px;box-shadow:none;background:#eceaff}
+body.simple-mode .pt b{font-size:12.5px}
+body.simple-mode .pt small{font-size:9.5px}
+body.simple-mode .project button>small{display:none}
+body.simple-mode .status{font-size:9px;padding:5px 7px}
+body.simple-mode .ext{width:34px;height:34px;border-radius:10px;box-shadow:none;background:#fff;border:1px solid rgba(103,113,137,.12)}
+body.simple-mode .addproject{border:1px dashed rgba(101,89,223,.35)!important;background:transparent!important;color:var(--p)!important;box-shadow:none!important;border-radius:12px!important;padding:10px!important}
+
+/* Simple project workspace */
+body.simple-mode .panel{width:min(760px,calc(100% - 24px));padding:22px;border-radius:25px;background:#f4f6fa;box-shadow:0 24px 70px rgba(31,41,59,.22)}
+body.simple-mode .dh{align-items:start;padding-bottom:14px}
+body.simple-mode .dh h2{font-size:31px;margin:3px 0 5px}
+body.simple-mode .dh p{margin:0;color:var(--muted)}
+body.simple-mode .close{box-shadow:none;border:1px solid rgba(103,113,137,.14);background:#fff}
+.simple-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:5px;margin:2px 0 16px;border-radius:14px;background:#e7ebf2;border:1px solid rgba(103,113,137,.1)}
+.simple-tab{border:0;background:transparent;border-radius:10px;padding:10px;cursor:pointer;color:var(--muted);font-weight:800;display:flex;align-items:center;justify-content:center;gap:7px}
+.simple-tab.on{background:#fff;color:var(--p);box-shadow:0 4px 12px rgba(67,78,102,.1)}
+.simple-tab-panel[hidden]{display:none!important}
+body.simple-mode .toolbar{margin:0 0 12px;border-radius:14px;padding:10px;box-shadow:none;background:#fff;border:1px solid rgba(103,113,137,.12)}
+body.simple-mode .settings{margin:0;border-radius:14px;padding:13px;box-shadow:none;background:#fff;border:1px solid rgba(103,113,137,.12)}
+body.simple-mode .settings summary{list-style:none;color:var(--ink)}
+body.simple-mode .settings summary::-webkit-details-marker{display:none}
+body.simple-mode .tasks{margin-top:0}
+body.simple-mode .tasks h3{font-size:17px;margin-bottom:10px}
+body.simple-mode .newtask{margin:0 0 12px;border-radius:13px;box-shadow:none;background:#fff;border:1px solid rgba(103,113,137,.13)}
+body.simple-mode .tasklist{gap:8px;margin-top:0}
+body.simple-mode .task{border-radius:14px;padding:11px;box-shadow:none;background:#fff;border:1px solid rgba(103,113,137,.12)}
+body.simple-mode .ctoggle{box-shadow:none;border:1px solid rgba(103,113,137,.13);background:#f7f8fb}
+body.simple-mode .comments{margin-top:10px}
+body.simple-mode .bubble{box-shadow:none;background:#f7f8fb;border:1px solid rgba(103,113,137,.1)}
+body.simple-mode .assets-section{margin-top:0}
+body.simple-mode .asset-row{box-shadow:none!important;background:#fff!important;border:1px solid rgba(103,113,137,.12)!important}
+.simple-info-note{padding:12px 14px;margin-bottom:10px;border-radius:13px;background:#fff;border:1px solid rgba(103,113,137,.12);color:var(--muted);font-size:13px;line-height:1.7}
+
+html[dir=rtl] .simple-guide-item{font-family:var(--font-fa)}
+@media(max-width:900px){body.simple-mode .grid{grid-template-columns:1fr}.simple-guide{grid-template-columns:1fr}.simple-guide-item{padding:10px 12px}}
+@media(max-width:760px){body.simple-mode .shell{width:calc(100% - 14px)}body.simple-mode .top{grid-template-columns:1fr auto}.simple-guide{display:none}body.simple-mode .hero{grid-template-columns:1fr;padding:20px}.sync{margin-top:5px}body.simple-mode .metrics{grid-template-columns:repeat(2,1fr)}body.simple-mode .panel{padding:16px}.simple-tabs{position:sticky;top:0;z-index:4}body.simple-mode .project button{grid-template-columns:auto 1fr}.status{display:none}}
