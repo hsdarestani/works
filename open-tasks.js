@@ -4,19 +4,46 @@
     filesView: 'Akten',
     openTasksView: 'Offene Aufgaben',
     noOpenTasks: 'Keine offenen Aufgaben.',
-    noOpenProjectTasks: 'Für dieses Projekt gibt es keine offenen Aufgaben.'
+    noOpenProjectTasks: 'Für dieses Projekt gibt es keine offenen Aufgaben.',
+    deleteTask: 'Aufgabe löschen',
+    confirmDeleteTask: 'Diese Aufgabe und alle Kommentare darin löschen?',
+    taskDeleted: 'Aufgabe wurde gelöscht.'
   });
   Object.assign(L.fa, {
     filesView: 'پرونده‌ها',
     openTasksView: 'تسک‌های باز',
     noOpenTasks: 'تسک بازی وجود ندارد.',
-    noOpenProjectTasks: 'برای این پروژه تسک بازی وجود ندارد.'
+    noOpenProjectTasks: 'برای این پروژه تسک بازی وجود ندارد.',
+    deleteTask: 'حذف تسک',
+    confirmDeleteTask: 'این تسک همراه با همه کامنت‌هایش حذف شود؟',
+    taskDeleted: 'تسک حذف شد.'
   });
 
   let activeView = localStorage.worksActiveView || 'accounts';
 
   function icon(name, fallback = '') {
     return typeof uiIcon === 'function' ? (uiIcon(name) || fallback) : fallback;
+  }
+
+  function removeTaskFromState(taskId) {
+    const id = +taskId;
+    S.data.comments = S.data.comments.filter(comment => +comment.task_id !== id);
+    S.data.tasks = S.data.tasks.filter(task => +task.id !== id);
+  }
+
+  async function deleteTaskRecord(task) {
+    if (!window.confirm(tr('confirmDeleteTask'))) return;
+    try {
+      if (S.mode === 'remote') {
+        await api(`tasks/${task.id}`, { method: 'DELETE' });
+      }
+      removeTaskFromState(task.id);
+      if (S.mode === 'local') save();
+      render();
+      toast(tr('taskDeleted'));
+    } catch (error) {
+      toast(error.message || tr('err'));
+    }
   }
 
   function setupViews() {
@@ -165,11 +192,13 @@
       group.tasks.forEach(task => {
         const row = document.createElement('div');
         row.className = 'open-task-row';
+        row.dataset.taskId = task.id;
         const commentCount = S.data.comments.filter(comment => +comment.task_id === +task.id).length;
         row.innerHTML = `
           <input class="open-task-check" type="checkbox" aria-label="${task.title}">
           <span class="open-task-title">${task.title}</span>
           <span class="open-task-comments">${commentCount ? `💬 ${commentCount}` : ''}</span>
+          <button class="open-task-delete" type="button" title="${tr('deleteTask')}" aria-label="${tr('deleteTask')}">${icon('trash', '×')}</button>
         `;
         row.querySelector('.open-task-check').onchange = async event => {
           if (!event.target.checked) return;
@@ -184,6 +213,11 @@
           }
         };
         row.querySelector('.open-task-title').onclick = () => openProject(group.project.id);
+        row.querySelector('.open-task-delete').onclick = event => {
+          event.preventDefault();
+          event.stopPropagation();
+          deleteTaskRecord(task);
+        };
         items.append(row);
       });
       list.append(card);
@@ -218,6 +252,7 @@
           <input type="checkbox">
           <div><span class="tasktitle">${task.title}</span><small class="taskmeta">${task.created_by || 'Hossein'}</small></div>
           <button class="ctoggle">💬 ${taskCommentList.length}</button>
+          <button class="task-delete" type="button" title="${tr('deleteTask')}" aria-label="${tr('deleteTask')}">${icon('trash', '×')}</button>
         </div>
         <div class="comments" hidden>
           <div class="commentlist"></div>
@@ -235,6 +270,12 @@
           event.target.disabled = false;
           toast(error.message || tr('err'));
         }
+      };
+
+      element.querySelector('.task-delete').onclick = event => {
+        event.preventDefault();
+        event.stopPropagation();
+        deleteTaskRecord(task);
       };
 
       const commentPanel = element.querySelector('.comments');
