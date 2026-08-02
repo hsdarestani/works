@@ -20,12 +20,15 @@
 
   const style = document.createElement('style');
   style.textContent = `
-    body.simple-mode .summary{
-      grid-template-columns:auto minmax(0,1fr) auto auto auto!important;
-    }
     body.simple-mode .project{
       grid-template-columns:minmax(0,1fr) auto auto!important;
       align-items:center;
+    }
+    .account-actions{
+      display:flex;
+      justify-content:flex-end;
+      padding:0 12px 9px;
+      margin-top:-3px;
     }
     .delete-account,.delete-project{
       position:static!important;
@@ -52,10 +55,6 @@
     }
     .delete-account svg,.delete-project svg{width:14px;height:14px}
     @media(max-width:500px){
-      body.simple-mode .summary{
-        grid-template-columns:auto minmax(0,1fr) auto auto!important;
-      }
-      body.simple-mode .summary .badge{display:none!important}
       .delete-account,.delete-project{opacity:1;width:29px;height:29px}
     }
   `;
@@ -149,11 +148,12 @@
       const account = accounts[accountIndex];
       if (!account) return;
 
-      const summary = card.querySelector('.summary');
-      if (summary && !summary.querySelector('.delete-account')) {
-        const button = makeDeleteButton('delete-account', tr('deleteAccount'), () => deleteAccount(account));
-        const caret = summary.lastElementChild;
-        summary.insertBefore(button, caret || null);
+      if (!card.querySelector('.account-actions')) {
+        const actions = document.createElement('div');
+        actions.className = 'account-actions';
+        actions.append(makeDeleteButton('delete-account', tr('deleteAccount'), () => deleteAccount(account)));
+        const projectsBox = card.querySelector('.projects');
+        card.insertBefore(actions, projectsBox || null);
       }
 
       const projects = S.data.projects
