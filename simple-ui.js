@@ -1,4 +1,4 @@
-/* A+ Works — simplify the product without removing capabilities */
+/* A+ Works — simplified interface without render loops */
 (() => {
   document.body.classList.add('simple-mode');
 
@@ -26,12 +26,14 @@
   });
 
   let currentTab = 'tasks';
-
-  /* Keep the dashboard clean when it first opens. Search results still open automatically. */
   S.open.clear();
 
   function icon(name) {
     return typeof uiIcon === 'function' ? uiIcon(name) : '';
+  }
+
+  function setText(element, value) {
+    if (element && element.textContent !== value) element.textContent = value;
   }
 
   function addGuide() {
@@ -47,25 +49,27 @@
   }
 
   function updateSimpleTexts() {
-    document.querySelectorAll('[data-simple]').forEach(el => {
-      el.textContent = tr(el.dataset.simple);
+    document.querySelectorAll('[data-simple]').forEach(element => {
+      setText(element, tr(element.dataset.simple));
     });
+
     const labels = {
       tasks: tr('tabTasks'),
       files: tr('tabFiles'),
       info: tr('tabInfo')
     };
-    document.querySelectorAll('.simple-tab').forEach(btn => {
-      const span = btn.querySelector('span');
-      if (span) span.textContent = labels[btn.dataset.tab] || '';
+
+    document.querySelectorAll('.simple-tab').forEach(button => {
+      setText(button.querySelector('span'), labels[button.dataset.tab] || '');
     });
-    const note = document.querySelector('.simple-info-note');
-    if (note) note.textContent = tr('infoHint');
+    setText(document.querySelector('.simple-info-note'), tr('infoHint'));
   }
 
   function showTab(tab) {
     currentTab = tab;
-    document.querySelectorAll('.simple-tab').forEach(btn => btn.classList.toggle('on', btn.dataset.tab === tab));
+    document.querySelectorAll('.simple-tab').forEach(button => {
+      button.classList.toggle('on', button.dataset.tab === tab);
+    });
     document.querySelectorAll('.simple-tab-panel').forEach(panel => {
       panel.hidden = panel.dataset.panel !== tab;
     });
@@ -90,7 +94,9 @@
         <button class="simple-tab" type="button" data-tab="info">${icon('settings') || icon('internal')}<span></span></button>
       `;
       header.insertAdjacentElement('afterend', tabs);
-      tabs.querySelectorAll('.simple-tab').forEach(btn => btn.onclick = () => showTab(btn.dataset.tab));
+      tabs.querySelectorAll('.simple-tab').forEach(button => {
+        button.onclick = () => showTab(button.dataset.tab);
+      });
     }
 
     tasks.classList.add('simple-tab-panel');
@@ -106,7 +112,7 @@
       infoPanel = document.createElement('section');
       infoPanel.className = 'simple-tab-panel';
       infoPanel.dataset.panel = 'info';
-      infoPanel.innerHTML = `<div class="simple-info-note"></div>`;
+      infoPanel.innerHTML = '<div class="simple-info-note"></div>';
       infoPanel.append(toolbar, settings);
       tabs.insertAdjacentElement('afterend', infoPanel);
     }
@@ -147,15 +153,9 @@
     updateSimpleTexts();
   };
 
-  const observer = new MutationObserver(() => {
-    buildProjectTabs();
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
-
-  [0, 200, 600, 1400].forEach(delay => setTimeout(() => {
+  [0, 250, 1000].forEach(delay => setTimeout(() => {
     addGuide();
     buildProjectTabs();
     updateSimpleTexts();
-    if (S.data && delay === 0) renderGrid();
   }, delay));
 })();
