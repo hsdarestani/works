@@ -22,43 +22,6 @@
     initialdemo: 'دموی وب‌سایت'
   });
 
-  const BROO_ACCOUNT = {
-    id: 25,
-    slug: 'broo-performance',
-    name: 'Broo Performance',
-    name_fa: 'Broo Performance',
-    type: 'website_client',
-    website_url: 'https://broo-performance.pages.dev/',
-    accent: '#d85b45',
-    sort_order: 25,
-    created_at: new Date().toISOString()
-  };
-  const BROO_PROJECT = {
-    id: 416,
-    account_id: 25,
-    title_de: 'Website Demo',
-    title_fa: 'دموی وب‌سایت',
-    description_de: 'Website-Demo für Broo Performance.',
-    description_fa: 'دموی وب‌سایت Broo Performance.',
-    kind: 'demo',
-    status: 'in_progress',
-    url: 'https://broo-performance.pages.dev/',
-    progress: 20,
-    sort_order: 1,
-    created_at: new Date().toISOString()
-  };
-
-  function ensureBrooLocal() {
-    if (!S.data) return;
-    if (!S.data.accounts.some(account => +account.id === 25 || account.slug === 'broo-performance')) {
-      S.data.accounts.push({ ...BROO_ACCOUNT });
-    }
-    if (!S.data.projects.some(project => +project.id === 416)) {
-      S.data.projects.push({ ...BROO_PROJECT });
-    }
-    if (S.mode === 'local') save();
-  }
-
   document.body.insertAdjacentHTML('beforeend', `
     <div class="account-modal" id="accountModal" hidden>
       <div class="account-modal-back" data-account-close></div>
@@ -204,7 +167,6 @@
 
   const originalRender = render;
   render = function () {
-    ensureBrooLocal();
     originalRender();
     addAccountButton();
     updateAccountTexts();
@@ -217,7 +179,6 @@
   };
 
   [0, 250, 1000].forEach(delay => setTimeout(() => {
-    ensureBrooLocal();
     addAccountButton();
     updateAccountTexts();
   }, delay));
