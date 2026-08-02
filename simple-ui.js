@@ -158,4 +158,12 @@
     buildProjectTabs();
     updateSimpleTexts();
   }, delay));
+
+  /* Never leave the dashboard blank forever if Cloudflare/D1 is slow. */
+  setTimeout(() => {
+    if (S.mode !== 'checking' || S.data) return;
+    S.data = local();
+    S.mode = 'local';
+    render();
+  }, 7000);
 })();
