@@ -37,10 +37,26 @@
             <option value="365">1 Jahr</option>
             <option value="0">Gesamt</option>
           </select>
-          <button class="secondary" id="rankRefresh" type="button">↻ Aktualisieren</button>
+          <button class="secondary" id="rankManualOpen" type="button">＋ Heutige Rankings</button>
         </div>
       </div>
       <div class="rank-config" id="rankConfig"></div>
+      <div class="rank-editor" id="rankEditor" hidden>
+        <div class="rank-editor-head">
+          <div><b>Manuellen Check eintragen</b><small>Zahl eintragen oder <code>NA</code>. Leer = nicht geprüft.</small></div>
+          <label>Datum <input id="rankDate" type="date"></label>
+        </div>
+        <div class="rank-editor-table-wrap">
+          <table class="rank-editor-table">
+            <thead><tr><th>Keyword</th><th>Organic</th><th>Orte</th><th>Prüfen</th></tr></thead>
+            <tbody id="rankEditorRows"></tbody>
+          </table>
+        </div>
+        <div class="rank-editor-actions">
+          <button class="secondary" id="rankManualCancel" type="button">Abbrechen</button>
+          <button class="primary" id="rankManualSave" type="button">Speichern</button>
+        </div>
+      </div>
       <div class="rank-metrics" id="rankMetrics"></div>
       <div class="rank-layout">
         <div class="rank-table-wrap">
@@ -51,7 +67,7 @@
         </div>
         <div class="rank-chart-card">
           <div class="rank-chart-title">
-            <div><b id="rankChartKeyword">Keyword wählen</b><small id="rankChartHint">Organic + Google Orte</small></div>
+            <div><b id="rankChartKeyword">Keyword wählen</b><small>Organic + Google Orte</small></div>
             <span class="rank-legend"><i class="gsc"></i>Organic <i class="maps"></i>Orte</span>
           </div>
           <div class="rank-chart" id="rankChart"><div class="rank-empty">Keyword auswählen</div></div>
@@ -64,7 +80,9 @@
       state.days = Number(event.target.value);
       await loadRankings(true);
     });
-    section.querySelector("#rankRefresh").addEventListener("click", collectNow);
+    section.querySelector("#rankManualOpen").addEventListener("click", openManualEditor);
+    section.querySelector("#rankManualCancel").addEventListener("click", closeManualEditor);
+    section.querySelector("#rankManualSave").addEventListener("click", saveManualEditor);
   }
 
   function entries(keywordId, source) {
@@ -108,7 +126,9 @@
     state.data.keywords.forEach(keyword => {
       ["gsc", "maps"].forEach(source => {
         const row = latest(keyword.id, source);
-        if (row?.position != null && Number.isFinite(Number(row.position))) points.push({ keyword, source, position: Number(row.position), delta: trend(keyword.id, source) });
+        if (row?.position != null && Number.isFinite(Number(row.position))) {
+          points.push({ position: Number(row.position), delta: trend(keyword.id, source) });
+        }
       });
     });
     const top10 = points.filter(p => p.position <= 10).length;
@@ -158,9 +178,9 @@
       return;
     }
     title.textContent = keyword.keyword;
-    const gsc = entries(keyword.id, "gsc").filter(r => r.position != null);
+    const organic = entries(keyword.id, "gsc").filter(r => r.position != null);
     const maps = entries(keyword.id, "maps").filter(r => r.position != null);
-    const all = [...gsc, ...maps];
+    const all = [...organic, ...maps];
     if (!all.length) {
       chart.innerHTML = '<div class="rank-empty">Noch keine Ranking-Daten</div>';
       return;
@@ -191,33 +211,103 @@
       return `<text x="${x}" y="${height - 9}" text-anchor="middle">${fmtDate(date).slice(0, 5)}</text>`;
     }).join("");
 
-    chart.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Ranking Verlauf">${lines}${poly(gsc, "gsc")}${poly(maps, "maps")}${xLabels}</svg>`;
+    chart.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Ranking Verlauf">${lines}${poly(organic, "gsc")}${poly(maps, "maps")}${xLabels}</svg>`;
   }
 
   function renderStatus() {
     const box = document.querySelector("#rankConfig");
     if (!box) return;
-    if (!state.status) {
-      box.innerHTML = "";
-      return;
-    }
-    const gsc = state.status.gsc_configured ? "Search Console ✓" : "Search Console nicht verbunden";
-    const maps = state.status.maps_configured ? "Google Orte ✓" : "Maps API nicht verbunden";
-    const ready = state.status.gsc_configured && state.status.maps_configured;
-    box.className = `rank-config ${ready ? "ready" : "warn"}`;
-    box.innerHTML = `<span>${gsc}</span><span>${maps}</span>${ready ? '<b>Tägliches Tracking bereit</b>' : '<b>API-Zugang noch konfigurieren</b>'}`;
+    box.className = "rank-config ready";
+    box.innerHTML = `<span>Manueller Google-Check</span><span>Keine API nötig</span><b>Organic und Orte getrennt gespeichert</b>`;
   }
 
   function renderAll() {
     renderStatus();
     renderMetrics();
-    renderRows();
     if (!state.selected && state.data?.keywords?.length) state.selected = Number(state.data.keywords[0].id);
     renderRows();
     renderChart();
     const latestDate = (state.data?.history || []).map(r => r.rank_date).sort().pop();
     const updated = document.querySelector("#rankUpdated");
-    if (updated) updated.textContent = latestDate ? `Letzter Datenpunkt: ${fmtDate(latestDate)} · Startwert: 18.07.2026` : "Startwert: 18.07.2026";
+    if (updated) updated.textContent = latestDate ? `Letzter Check: ${fmtDate(latestDate)} · Startwert: 18.07.2026` : "Startwert: 18.07.2026";
+  }
+
+  function valueForDate(keywordId, source, date) {
+    const row = (state.data?.history || []).find(r => Number(r.keyword_id) === Number(keywordId) && r.source === source && r.rank_date === date);
+    if (!row) return "";
+    return row.position == null ? "NA" : fmtPos(row.position);
+  }
+
+  function renderEditorRows(date) {
+    const body = document.querySelector("#rankEditorRows");
+    if (!body || !state.data) return;
+    body.innerHTML = state.data.keywords.map(keyword => {
+      const q = encodeURIComponent(keyword.keyword);
+      return `
+        <tr data-keyword-id="${keyword.id}">
+          <td><b>${esc(keyword.keyword)}</b></td>
+          <td><input class="rank-input" data-source="gsc" value="${esc(valueForDate(keyword.id, "gsc", date))}" placeholder="— / NA" inputmode="decimal"></td>
+          <td><input class="rank-input" data-source="maps" value="${esc(valueForDate(keyword.id, "maps", date))}" placeholder="— / NA" inputmode="decimal"></td>
+          <td class="rank-check-links"><a href="https://www.google.com/search?q=${q}&hl=de&gl=de&pws=0" target="_blank" rel="noopener">Google</a><a href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener">Maps</a></td>
+        </tr>`;
+    }).join("");
+  }
+
+  function openManualEditor() {
+    if (!state.data) return;
+    const editor = document.querySelector("#rankEditor");
+    const dateInput = document.querySelector("#rankDate");
+    const date = state.data.today || new Date().toISOString().slice(0, 10);
+    dateInput.value = date;
+    renderEditorRows(date);
+    dateInput.onchange = () => renderEditorRows(dateInput.value);
+    editor.hidden = false;
+    editor.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function closeManualEditor() {
+    const editor = document.querySelector("#rankEditor");
+    if (editor) editor.hidden = true;
+  }
+
+  async function saveManualEditor() {
+    const editor = document.querySelector("#rankEditor");
+    const button = document.querySelector("#rankManualSave");
+    const rankDate = document.querySelector("#rankDate")?.value;
+    if (!editor || !button || !rankDate) return;
+
+    const entries = [];
+    editor.querySelectorAll("#rankEditorRows tr").forEach(row => {
+      const keywordId = Number(row.dataset.keywordId);
+      row.querySelectorAll(".rank-input").forEach(input => {
+        const value = input.value.trim();
+        if (!value) return;
+        entries.push({ keyword_id: keywordId, source: input.dataset.source, position: value });
+      });
+    });
+
+    if (!entries.length) {
+      toast("Keine Rankings eingetragen");
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Speichere…";
+    try {
+      const result = await api("rankings/manual", {
+        method: "POST",
+        body: JSON.stringify({ rank_date: rankDate, entries })
+      });
+      toast(`${result.saved} Rankings für ${fmtDate(rankDate)} gespeichert`);
+      closeManualEditor();
+      state.data = null;
+      await loadRankings(true);
+    } catch (error) {
+      toast(`Ranking: ${error.message}`);
+    } finally {
+      button.disabled = false;
+      button.textContent = "Speichern";
+    }
   }
 
   async function loadRankings(force = false) {
@@ -250,29 +340,6 @@
     } finally {
       state.loading = false;
       section.classList.remove("loading");
-    }
-  }
-
-  async function collectNow() {
-    const button = document.querySelector("#rankRefresh");
-    if (!button || state.loading) return;
-    button.disabled = true;
-    button.textContent = "Aktualisiere…";
-    try {
-      const result = await api("rankings/collect", { method: "POST", body: "{}" });
-      const parts = [];
-      if (result.gsc?.ok) parts.push(`GSC: ${result.gsc.saved} Datensätze`);
-      else if (result.gsc?.error) parts.push(`GSC: ${result.gsc.error}`);
-      if (result.maps?.ok) parts.push(`Orte: ${result.maps.saved} Keywords`);
-      else if (result.maps?.error) parts.push(`Orte: ${result.maps.error}`);
-      toast(parts.join(" · ") || "Ranking-Update abgeschlossen");
-      state.data = null;
-      await loadRankings(true);
-    } catch (error) {
-      toast(`Ranking-Update: ${error.message}`);
-    } finally {
-      button.disabled = false;
-      button.textContent = "↻ Aktualisieren";
     }
   }
 
