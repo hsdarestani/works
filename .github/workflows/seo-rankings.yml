@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "scripts/seo-rank-bot.mjs"
+      - "scripts/seo-rank-bot-v2.mjs"
       - ".github/workflows/seo-rankings.yml"
   schedule:
     - cron: "17 6 * * *"
@@ -41,7 +41,7 @@ jobs:
       - name: Check Google and Maps rankings
         id: rank
         continue-on-error: true
-        run: node scripts/seo-rank-bot.mjs
+        run: node scripts/seo-rank-bot-v2.mjs
 
       - name: Commit ranking snapshot
         if: always()
