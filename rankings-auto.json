@@ -1,6 +1,6 @@
 {
   "project_id": 201,
-  "generated_at": "2026-08-10T20:30:00.000Z",
+  "generated_at": "2026-08-10T20:54:12.615Z",
   "settings": {
     "locale": "de-DE",
     "timezone": "Europe/Berlin",
@@ -10,27 +10,243 @@
     "target_domain": "a-esthetic.de",
     "target_business": "A+ Esthetic"
   },
-  "runs": [],
+  "runs": [
+    {
+      "rank_date": "2026-08-10",
+      "checked_at": "2026-08-10T20:54:12.615Z",
+      "origin": "playwright_incognito",
+      "ok": 4,
+      "not_found": 6,
+      "blocked": 10,
+      "errors": 0,
+      "details": [
+        {
+          "keyword": "Botox Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "blocked"
+        },
+        {
+          "keyword": "Botox Frankfurt",
+          "source": "maps",
+          "position": 23,
+          "status": "ok",
+          "matched_text": "A+ Esthetic / Zentrum für Ästhetik · A+ Esthetic / Zentrum für Ästhetik · 5,0",
+          "results_seen": 60
+        },
+        {
+          "keyword": "Masseter Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "blocked"
+        },
+        {
+          "keyword": "Masseter Frankfurt",
+          "source": "maps",
+          "position": 14,
+          "status": "ok",
+          "matched_text": "A+ Esthetic / Zentrum für Ästhetik · A+ Esthetic / Zentrum für Ästhetik · 5,0",
+          "results_seen": 37
+        },
+        {
+          "keyword": "Vitamin Infusion Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "blocked"
+        },
+        {
+          "keyword": "Vitamin Infusion Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "not_found",
+          "results_seen": 8
+        },
+        {
+          "keyword": "Filler Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "blocked"
+        },
+        {
+          "keyword": "Filler Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "not_found",
+          "results_seen": 16
+        },
+        {
+          "keyword": "Fett weg Spritze Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "blocked"
+        },
+        {
+          "keyword": "Fett weg Spritze Frankfurt",
+          "source": "maps",
+          "position": 20,
+          "status": "ok",
+          "matched_text": "A+ Esthetic / Zentrum für Ästhetik · A+ Esthetic / Zentrum für Ästhetik · 5,0",
+          "results_seen": 55
+        },
+        {
+          "keyword": "Skinbooster Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "blocked"
+        },
+        {
+          "keyword": "Skinbooster Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "not_found",
+          "results_seen": 8
+        },
+        {
+          "keyword": "Haarentfernung Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "blocked"
+        },
+        {
+          "keyword": "Haarentfernung Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "not_found",
+          "results_seen": 60
+        },
+        {
+          "keyword": "Dauerhafte Haarentfernung Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "blocked"
+        },
+        {
+          "keyword": "Dauerhafte Haarentfernung Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "not_found",
+          "results_seen": 60
+        },
+        {
+          "keyword": "PRP Behandlung Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "blocked"
+        },
+        {
+          "keyword": "PRP Behandlung Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "not_found",
+          "results_seen": 21
+        },
+        {
+          "keyword": "Masseter Botox Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "blocked"
+        },
+        {
+          "keyword": "Masseter Botox Frankfurt",
+          "source": "maps",
+          "position": 17,
+          "status": "ok",
+          "matched_text": "A+ Esthetic / Zentrum für Ästhetik · A+ Esthetic / Zentrum für Ästhetik · 5,0",
+          "results_seen": 34
+        }
+      ]
+    }
+  ],
   "snapshots": [
     {
       "rank_date": "2026-07-18",
       "checked_at": "2026-07-18T12:00:00.000Z",
       "origin": "manual_incognito",
       "entries": [
-        {"keyword":"Botox Frankfurt","source":"maps","position":11,"status":"ok"},
-        {"keyword":"Masseter Frankfurt","source":"maps","position":8,"status":"ok"},
-        {"keyword":"Vitamin Infusion Frankfurt","source":"gsc","position":29,"status":"ok"},
-        {"keyword":"Filler Frankfurt","source":"gsc","position":77,"status":"ok"},
-        {"keyword":"Fett weg Spritze Frankfurt","source":"gsc","position":37,"status":"ok"},
-        {"keyword":"Fett weg Spritze Frankfurt","source":"maps","position":12,"status":"ok"},
-        {"keyword":"Skinbooster Frankfurt","source":"maps","position":14,"status":"ok"},
-        {"keyword":"Haarentfernung Frankfurt","source":"gsc","position":null,"status":"not_found"},
-        {"keyword":"Haarentfernung Frankfurt","source":"maps","position":null,"status":"not_found"},
-        {"keyword":"Dauerhafte Haarentfernung Frankfurt","source":"gsc","position":null,"status":"not_found"},
-        {"keyword":"Dauerhafte Haarentfernung Frankfurt","source":"maps","position":null,"status":"not_found"},
-        {"keyword":"PRP Behandlung Frankfurt","source":"gsc","position":37,"status":"ok"},
-        {"keyword":"Masseter Botox Frankfurt","source":"maps","position":12,"status":"ok"},
-        {"keyword":"Masseter Botox Frankfurt","source":"gsc","position":19,"status":"ok"}
+        {
+          "keyword": "Botox Frankfurt",
+          "source": "maps",
+          "position": 11,
+          "status": "ok"
+        },
+        {
+          "keyword": "Masseter Frankfurt",
+          "source": "maps",
+          "position": 8,
+          "status": "ok"
+        },
+        {
+          "keyword": "Vitamin Infusion Frankfurt",
+          "source": "gsc",
+          "position": 29,
+          "status": "ok"
+        },
+        {
+          "keyword": "Filler Frankfurt",
+          "source": "gsc",
+          "position": 77,
+          "status": "ok"
+        },
+        {
+          "keyword": "Fett weg Spritze Frankfurt",
+          "source": "gsc",
+          "position": 37,
+          "status": "ok"
+        },
+        {
+          "keyword": "Fett weg Spritze Frankfurt",
+          "source": "maps",
+          "position": 12,
+          "status": "ok"
+        },
+        {
+          "keyword": "Skinbooster Frankfurt",
+          "source": "maps",
+          "position": 14,
+          "status": "ok"
+        },
+        {
+          "keyword": "Haarentfernung Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "not_found"
+        },
+        {
+          "keyword": "Haarentfernung Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "not_found"
+        },
+        {
+          "keyword": "Dauerhafte Haarentfernung Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "not_found"
+        },
+        {
+          "keyword": "Dauerhafte Haarentfernung Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "not_found"
+        },
+        {
+          "keyword": "PRP Behandlung Frankfurt",
+          "source": "gsc",
+          "position": 37,
+          "status": "ok"
+        },
+        {
+          "keyword": "Masseter Botox Frankfurt",
+          "source": "maps",
+          "position": 12,
+          "status": "ok"
+        },
+        {
+          "keyword": "Masseter Botox Frankfurt",
+          "source": "gsc",
+          "position": 19,
+          "status": "ok"
+        }
       ]
     },
     {
@@ -38,23 +254,229 @@
       "checked_at": "2026-08-10T20:20:00.000Z",
       "origin": "manual_incognito",
       "entries": [
-        {"keyword":"Botox Frankfurt","source":"maps","position":16,"status":"ok"},
-        {"keyword":"Botox Frankfurt","source":"gsc","position":19,"status":"ok"},
-        {"keyword":"Masseter Frankfurt","source":"maps","position":17,"status":"ok"},
-        {"keyword":"Masseter Frankfurt","source":"gsc","position":7,"status":"ok"},
-        {"keyword":"Vitamin Infusion Frankfurt","source":"gsc","position":11,"status":"ok"},
-        {"keyword":"Filler Frankfurt","source":"gsc","position":59,"status":"ok"},
-        {"keyword":"Fett weg Spritze Frankfurt","source":"gsc","position":24,"status":"ok"},
-        {"keyword":"Fett weg Spritze Frankfurt","source":"maps","position":19,"status":"ok"},
-        {"keyword":"Skinbooster Frankfurt","source":"maps","position":18,"status":"ok"},
-        {"keyword":"Skinbooster Frankfurt","source":"gsc","position":19,"status":"ok"},
-        {"keyword":"Haarentfernung Frankfurt","source":"gsc","position":null,"status":"not_found"},
-        {"keyword":"Haarentfernung Frankfurt","source":"maps","position":null,"status":"not_found"},
-        {"keyword":"Dauerhafte Haarentfernung Frankfurt","source":"gsc","position":null,"status":"not_found"},
-        {"keyword":"Dauerhafte Haarentfernung Frankfurt","source":"maps","position":null,"status":"not_found"},
-        {"keyword":"PRP Behandlung Frankfurt","source":"gsc","position":22,"status":"ok"},
-        {"keyword":"Masseter Botox Frankfurt","source":"maps","position":24,"status":"ok"},
-        {"keyword":"Masseter Botox Frankfurt","source":"gsc","position":15,"status":"ok"}
+        {
+          "keyword": "Botox Frankfurt",
+          "source": "maps",
+          "position": 16,
+          "status": "ok"
+        },
+        {
+          "keyword": "Botox Frankfurt",
+          "source": "gsc",
+          "position": 19,
+          "status": "ok"
+        },
+        {
+          "keyword": "Masseter Frankfurt",
+          "source": "maps",
+          "position": 17,
+          "status": "ok"
+        },
+        {
+          "keyword": "Masseter Frankfurt",
+          "source": "gsc",
+          "position": 7,
+          "status": "ok"
+        },
+        {
+          "keyword": "Vitamin Infusion Frankfurt",
+          "source": "gsc",
+          "position": 11,
+          "status": "ok"
+        },
+        {
+          "keyword": "Filler Frankfurt",
+          "source": "gsc",
+          "position": 59,
+          "status": "ok"
+        },
+        {
+          "keyword": "Fett weg Spritze Frankfurt",
+          "source": "gsc",
+          "position": 24,
+          "status": "ok"
+        },
+        {
+          "keyword": "Fett weg Spritze Frankfurt",
+          "source": "maps",
+          "position": 19,
+          "status": "ok"
+        },
+        {
+          "keyword": "Skinbooster Frankfurt",
+          "source": "maps",
+          "position": 18,
+          "status": "ok"
+        },
+        {
+          "keyword": "Skinbooster Frankfurt",
+          "source": "gsc",
+          "position": 19,
+          "status": "ok"
+        },
+        {
+          "keyword": "Haarentfernung Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "not_found"
+        },
+        {
+          "keyword": "Haarentfernung Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "not_found"
+        },
+        {
+          "keyword": "Dauerhafte Haarentfernung Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "not_found"
+        },
+        {
+          "keyword": "Dauerhafte Haarentfernung Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "not_found"
+        },
+        {
+          "keyword": "PRP Behandlung Frankfurt",
+          "source": "gsc",
+          "position": 22,
+          "status": "ok"
+        },
+        {
+          "keyword": "Masseter Botox Frankfurt",
+          "source": "maps",
+          "position": 24,
+          "status": "ok"
+        },
+        {
+          "keyword": "Masseter Botox Frankfurt",
+          "source": "gsc",
+          "position": 15,
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "rank_date": "2026-08-10",
+      "checked_at": "2026-08-10T20:54:12.615Z",
+      "origin": "playwright_incognito",
+      "entries": [
+        {
+          "keyword": "Botox Frankfurt",
+          "source": "maps",
+          "position": 23,
+          "status": "ok",
+          "metadata": {
+            "position": 23,
+            "status": "ok",
+            "matched_text": "A+ Esthetic / Zentrum für Ästhetik · A+ Esthetic / Zentrum für Ästhetik · 5,0",
+            "results_seen": 60
+          }
+        },
+        {
+          "keyword": "Masseter Frankfurt",
+          "source": "maps",
+          "position": 14,
+          "status": "ok",
+          "metadata": {
+            "position": 14,
+            "status": "ok",
+            "matched_text": "A+ Esthetic / Zentrum für Ästhetik · A+ Esthetic / Zentrum für Ästhetik · 5,0",
+            "results_seen": 37
+          }
+        },
+        {
+          "keyword": "Vitamin Infusion Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "not_found",
+          "metadata": {
+            "position": null,
+            "status": "not_found",
+            "results_seen": 8
+          }
+        },
+        {
+          "keyword": "Filler Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "not_found",
+          "metadata": {
+            "position": null,
+            "status": "not_found",
+            "results_seen": 16
+          }
+        },
+        {
+          "keyword": "Fett weg Spritze Frankfurt",
+          "source": "maps",
+          "position": 20,
+          "status": "ok",
+          "metadata": {
+            "position": 20,
+            "status": "ok",
+            "matched_text": "A+ Esthetic / Zentrum für Ästhetik · A+ Esthetic / Zentrum für Ästhetik · 5,0",
+            "results_seen": 55
+          }
+        },
+        {
+          "keyword": "Skinbooster Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "not_found",
+          "metadata": {
+            "position": null,
+            "status": "not_found",
+            "results_seen": 8
+          }
+        },
+        {
+          "keyword": "Haarentfernung Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "not_found",
+          "metadata": {
+            "position": null,
+            "status": "not_found",
+            "results_seen": 60
+          }
+        },
+        {
+          "keyword": "Dauerhafte Haarentfernung Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "not_found",
+          "metadata": {
+            "position": null,
+            "status": "not_found",
+            "results_seen": 60
+          }
+        },
+        {
+          "keyword": "PRP Behandlung Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "not_found",
+          "metadata": {
+            "position": null,
+            "status": "not_found",
+            "results_seen": 21
+          }
+        },
+        {
+          "keyword": "Masseter Botox Frankfurt",
+          "source": "maps",
+          "position": 17,
+          "status": "ok",
+          "metadata": {
+            "position": 17,
+            "status": "ok",
+            "matched_text": "A+ Esthetic / Zentrum für Ästhetik · A+ Esthetic / Zentrum für Ästhetik · 5,0",
+            "results_seen": 34
+          }
+        }
       ]
     }
   ]
