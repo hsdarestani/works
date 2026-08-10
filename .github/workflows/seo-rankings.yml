@@ -1,6 +1,11 @@
 name: Daily A+ Esthetic Rankings
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/seo-rank-bot.mjs"
+      - ".github/workflows/seo-rankings.yml"
   schedule:
     - cron: "17 6 * * *"
       timezone: "Europe/Berlin"
