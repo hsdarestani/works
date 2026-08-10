@@ -1,0 +1,56 @@
+name: Daily A+ Esthetic Rankings
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+      timezone: "Europe/Berlin"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: a-esthetic-seo-rankings
+  cancel-in-progress: false
+
+jobs:
+  rank-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Check Google and Maps rankings
+        id: rank
+        continue-on-error: true
+        run: node scripts/seo-rank-bot.mjs
+
+      - name: Commit ranking snapshot
+        if: always()
+        run: |
+          if git diff --quiet -- rankings-auto.json; then
+            echo "No ranking data change to commit."
+            exit 0
+          fi
+          git config user.name "A+ Rank Bot"
+          git config user.email "45485005+hsdarestani@users.noreply.github.com"
+          git add rankings-auto.json
+          git commit -m "Update A+ Esthetic SEO rankings"
+          git push
+
+      - name: Report bot problem
+        if: steps.rank.outcome == 'failure'
+        run: echo "Rank bot encountered a full block/error. The run log was preserved when possible; no fake rankings were written."
