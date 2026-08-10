@@ -1,41 +1,47 @@
 # A+ Esthetic SEO Rank Tracker
 
-The rank tracker is embedded in **A+ Esthetic → Website & SEO** (project `201`). It keeps separate history for Search Console (organic) and Google Maps / Orte. The first manual snapshot is seeded with the report date **2026-07-18**.
+The tracker is embedded in **A+ Esthetic → Website & SEO** (project `201`). It stores **Organic / Google Search** and **Google Orte / Maps** separately and keeps every dated snapshot for charts and trend calculations.
 
-## Cloudflare Pages variables / secrets
+No external ranking API is required.
 
-Set these on the existing A+ Works Pages project:
+## Seeded snapshots
 
-- `GSC_CLIENT_EMAIL` — Google service-account email.
-- `GSC_PRIVATE_KEY` — PKCS#8 private key from the service-account JSON. Multiline or `\\n` escaped values both work.
-- `GSC_PROPERTY` — Search Console property, for example `sc-domain:a-esthetic.de` or `https://a-esthetic.de/`, matching the property to which the service account was granted access.
-- `SERPAPI_KEY` — SerpApi key for Google Maps searches.
-- `RANK_CRON_SECRET` — a long random secret used by the scheduled GitHub Action.
-- Optional `MAPS_PLACE_ID` — recommended once known, to identify the exact Google Business Profile reliably.
-- Optional `MAPS_MATCH_TEXT` — defaults to `a+ esthetic`.
-- Optional `MAPS_LL` — defaults to central Frankfurt: `@50.1109,8.6821,13z`.
+Two manual public-Google checks are currently seeded:
 
-The existing `APP_PASSWORD` also authorizes the in-app **Aktualisieren** button.
+- **2026-07-18** — first manual report.
+- **2026-08-10** — current manual report.
 
-## Google Search Console
+`NA` is stored as a checked result with no numeric position. A missing value means that source was not checked / not supplied for that keyword on that date.
 
-Grant the service-account email access to the A+ Esthetic Search Console property. The collector requests read-only Search Console access and stores position, clicks, impressions and CTR by date.
+## Daily/manual workflow
 
-## GitHub Actions daily schedule
+Open **A+ Esthetic → Website & SEO → Keyword Rankings** and click **Heutige Rankings**.
 
-The workflow `.github/workflows/seo-rankings.yml` runs daily at `05:20 UTC` and calls the deployed A+ Works endpoint.
+For every keyword:
 
-Configure in GitHub repository settings:
+- Enter the Organic rank in the Organic field.
+- Enter the local Google Orte / Maps rank in the Orte field.
+- Enter `NA` when you checked and A+ Esthetic was not found.
+- Leave the field empty when that source was not checked.
+- The Google and Maps links open the public searches for that keyword to make the manual check faster.
 
-- Repository variable `RANK_TRACKER_URL` — the deployed A+ Works origin, e.g. `https://...pages.dev` or the custom domain, without `/api`.
-- Repository secret `RANK_CRON_SECRET` — exactly the same value as the Cloudflare Pages secret.
+Change the date when entering an older report. Saving a date again updates that date instead of creating a duplicate.
 
-You can also run the workflow manually with **Run workflow**.
+## Dashboard
+
+The tracker shows:
+
+- current Organic and Orte positions per keyword;
+- change versus the previous numeric observation;
+- Top 10 / Top 20 totals;
+- improved and dropped observations;
+- per-keyword history chart;
+- 30-day, 90-day, 120-day, one-year and all-time ranges.
 
 ## API
 
 - `GET /api/rankings/201?days=120` — keyword definitions and history.
-- `GET /api/rankings/status` — non-sensitive configuration status.
-- `POST /api/rankings/collect` — collect GSC + Maps now. Authorized by the app password or rank cron secret.
+- `GET /api/rankings/status` — tracker mode/status.
+- `POST /api/rankings/manual` — save a manual dated snapshot from the app.
 
-The API creates its D1 tables automatically with `CREATE TABLE IF NOT EXISTS`, so existing deployments do not require a manual migration. The SQL migration is included as documentation / optional manual setup.
+The ranking endpoint creates its D1 tables automatically with `CREATE TABLE IF NOT EXISTS`, so the existing D1 database does not need a manual migration. `migrations/001_seo_rank_tracker.sql` is retained as schema documentation / optional manual setup.
