@@ -1,0 +1,34 @@
+name: Daily SEO Rankings
+
+on:
+  schedule:
+    - cron: "20 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate configuration
+        env:
+          RANK_TRACKER_URL: ${{ vars.RANK_TRACKER_URL }}
+          RANK_CRON_SECRET: ${{ secrets.RANK_CRON_SECRET }}
+        run: |
+          test -n "$RANK_TRACKER_URL" || { echo "Repository variable RANK_TRACKER_URL is missing"; exit 1; }
+          test -n "$RANK_CRON_SECRET" || { echo "Repository secret RANK_CRON_SECRET is missing"; exit 1; }
+
+      - name: Collect Search Console and Maps rankings
+        env:
+          RANK_TRACKER_URL: ${{ vars.RANK_TRACKER_URL }}
+          RANK_CRON_SECRET: ${{ secrets.RANK_CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          base="${RANK_TRACKER_URL%/}"
+          curl --fail-with-body --retry 2 --retry-delay 10 \
+            -X POST "$base/api/rankings/collect" \
+            -H "content-type: application/json" \
+            -H "x-rank-cron-secret: $RANK_CRON_SECRET" \
+            --data '{}'
