@@ -5,16 +5,22 @@
 
   async function loadAuto() {
     if (autoCache) return autoCache;
-    try {
-      const response = await fetch(`./rankings-auto.json?v=${Date.now()}`, { cache: "no-store" });
-      if (!response.ok) throw new Error(`rankings-auto.json ${response.status}`);
-      autoCache = await response.json();
-      window.__rankAutoData = autoCache;
-      return autoCache;
-    } catch (error) {
-      console.warn("Automated ranking history unavailable", error);
-      return null;
+    const urls = [
+      `https://raw.githubusercontent.com/hsdarestani/works/main/rankings-auto.json?v=${Date.now()}`,
+      `./rankings-auto.json?v=${Date.now()}`
+    ];
+    for (const url of urls) {
+      try {
+        const response = await fetch(url, { cache: "no-store" });
+        if (!response.ok) throw new Error(`${url} ${response.status}`);
+        autoCache = await response.json();
+        window.__rankAutoData = autoCache;
+        return autoCache;
+      } catch (error) {
+        console.warn("Ranking history source unavailable", error);
+      }
     }
+    return null;
   }
 
   function cutoffFor(days) {
