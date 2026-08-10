@@ -16,6 +16,7 @@ const KEYWORDS = [
 ];
 const TARGET_DOMAIN = "a-esthetic.de";
 const FRANKFURT = { latitude: 50.1109, longitude: 8.6821 };
+const MIN_MAP_RESULTS_FOR_NOT_FOUND = 50;
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 function berlinDate() {
@@ -165,9 +166,13 @@ async function mapsRank(context, keyword) {
       places.push(card);
     }
     const index = places.findIndex(place => isTargetBusiness(place.text) || normalize(place.href).includes(TARGET_DOMAIN));
-    return index >= 0
-      ? { position: index + 1, status: "ok", matched_text: places[index].text.split("\n").slice(0, 3).join(" · "), results_seen: places.length }
-      : { position: null, status: "not_found", results_seen: places.length };
+    if (index >= 0) {
+      return { position: index + 1, status: "ok", matched_text: places[index].text.split("\n").slice(0, 3).join(" · "), results_seen: places.length };
+    }
+    if (places.length >= MIN_MAP_RESULTS_FOR_NOT_FOUND) {
+      return { position: null, status: "not_found", results_seen: places.length };
+    }
+    return { position: null, status: "inconclusive", results_seen: places.length, reason: "Too few Maps results loaded to assert not_found safely" };
   } catch (error) {
     return { position: null, status: "error", error: error.message || String(error) };
   } finally {
@@ -220,6 +225,7 @@ async function main() {
     origin: "playwright_incognito_v2",
     ok: details.filter(x => x.status === "ok").length,
     not_found: details.filter(x => x.status === "not_found").length,
+    inconclusive: details.filter(x => x.status === "inconclusive").length,
     blocked: details.filter(x => x.status === "blocked").length,
     errors: details.filter(x => x.status === "error").length,
     details
@@ -236,7 +242,7 @@ async function main() {
   }
   await fs.writeFile(DATA_FILE, `${JSON.stringify(data, null, 2)}\n`);
   console.log(`Saved ${entries.length} valid observations for ${today}.`);
-  console.log(`Summary: ${summary.ok} found, ${summary.not_found} not found, ${summary.blocked} blocked, ${summary.errors} errors.`);
+  console.log(`Summary: ${summary.ok} found, ${summary.not_found} not found, ${summary.inconclusive} inconclusive, ${summary.blocked} blocked, ${summary.errors} errors.`);
 }
 
 await main();
