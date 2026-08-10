@@ -8,21 +8,21 @@ on:
 permissions:
   contents: read
 
+env:
+  RANK_TRACKER_URL: https://works.hsdf7rb.workers.dev
+
 jobs:
   collect:
     runs-on: ubuntu-latest
     steps:
       - name: Validate configuration
         env:
-          RANK_TRACKER_URL: ${{ vars.RANK_TRACKER_URL }}
           RANK_CRON_SECRET: ${{ secrets.RANK_CRON_SECRET }}
         run: |
-          test -n "$RANK_TRACKER_URL" || { echo "Repository variable RANK_TRACKER_URL is missing"; exit 1; }
           test -n "$RANK_CRON_SECRET" || { echo "Repository secret RANK_CRON_SECRET is missing"; exit 1; }
 
       - name: Collect Search Console and Maps rankings
         env:
-          RANK_TRACKER_URL: ${{ vars.RANK_TRACKER_URL }}
           RANK_CRON_SECRET: ${{ secrets.RANK_CRON_SECRET }}
         run: |
           set -euo pipefail
