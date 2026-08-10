@@ -5,9 +5,7 @@ const JSON_HEADERS = {
 
 const PROJECT_ID = 201;
 const BASELINE_DATE = "2026-07-18";
-const DEFAULT_PROPERTY = "https://a-esthetic.de/";
-const MAPS_MATCH_TEXT = "a+ esthetic";
-const MAPS_DOMAIN = "a-esthetic.de";
+const CURRENT_DATE = "2026-08-10";
 
 const KEYWORDS = [
   "Botox Frankfurt",
@@ -22,17 +20,39 @@ const KEYWORDS = [
   "Masseter Botox Frankfurt"
 ];
 
-const BASELINE = [
-  ["Botox Frankfurt", "maps", 11],
-  ["Masseter Frankfurt", "maps", 8],
-  ["Vitamin Infusion Frankfurt", "gsc", 29],
-  ["Filler Frankfurt", "gsc", 77],
-  ["Fett weg Spritze Frankfurt", "gsc", 37],
-  ["Fett weg Spritze Frankfurt", "maps", 12],
-  ["Skinbooster Frankfurt", "maps", 14],
-  ["PRP Behandlung Frankfurt", "gsc", 37],
-  ["Masseter Botox Frankfurt", "maps", 12],
-  ["Masseter Botox Frankfurt", "gsc", 19]
+const SEED = [
+  [BASELINE_DATE, "Botox Frankfurt", "maps", 11],
+  [BASELINE_DATE, "Masseter Frankfurt", "maps", 8],
+  [BASELINE_DATE, "Vitamin Infusion Frankfurt", "gsc", 29],
+  [BASELINE_DATE, "Filler Frankfurt", "gsc", 77],
+  [BASELINE_DATE, "Fett weg Spritze Frankfurt", "gsc", 37],
+  [BASELINE_DATE, "Fett weg Spritze Frankfurt", "maps", 12],
+  [BASELINE_DATE, "Skinbooster Frankfurt", "maps", 14],
+  [BASELINE_DATE, "Haarentfernung Frankfurt", "gsc", null],
+  [BASELINE_DATE, "Haarentfernung Frankfurt", "maps", null],
+  [BASELINE_DATE, "Dauerhafte Haarentfernung Frankfurt", "gsc", null],
+  [BASELINE_DATE, "Dauerhafte Haarentfernung Frankfurt", "maps", null],
+  [BASELINE_DATE, "PRP Behandlung Frankfurt", "gsc", 37],
+  [BASELINE_DATE, "Masseter Botox Frankfurt", "maps", 12],
+  [BASELINE_DATE, "Masseter Botox Frankfurt", "gsc", 19],
+
+  [CURRENT_DATE, "Botox Frankfurt", "maps", 16],
+  [CURRENT_DATE, "Botox Frankfurt", "gsc", 19],
+  [CURRENT_DATE, "Masseter Frankfurt", "maps", 17],
+  [CURRENT_DATE, "Masseter Frankfurt", "gsc", 7],
+  [CURRENT_DATE, "Vitamin Infusion Frankfurt", "gsc", 11],
+  [CURRENT_DATE, "Filler Frankfurt", "gsc", 59],
+  [CURRENT_DATE, "Fett weg Spritze Frankfurt", "gsc", 24],
+  [CURRENT_DATE, "Fett weg Spritze Frankfurt", "maps", 19],
+  [CURRENT_DATE, "Skinbooster Frankfurt", "maps", 18],
+  [CURRENT_DATE, "Skinbooster Frankfurt", "gsc", 19],
+  [CURRENT_DATE, "Haarentfernung Frankfurt", "gsc", null],
+  [CURRENT_DATE, "Haarentfernung Frankfurt", "maps", null],
+  [CURRENT_DATE, "Dauerhafte Haarentfernung Frankfurt", "gsc", null],
+  [CURRENT_DATE, "Dauerhafte Haarentfernung Frankfurt", "maps", null],
+  [CURRENT_DATE, "PRP Behandlung Frankfurt", "gsc", 22],
+  [CURRENT_DATE, "Masseter Botox Frankfurt", "maps", 24],
+  [CURRENT_DATE, "Masseter Botox Frankfurt", "gsc", 15]
 ];
 
 function json(data, status = 200) {
@@ -50,10 +70,6 @@ function normalizeKeyword(value) {
   return String(value || "").trim().toLocaleLowerCase("de-DE");
 }
 
-function escapeRegex(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
 function berlinDate(date = new Date()) {
   const parts = new Intl.DateTimeFormat("en-GB", {
     timeZone: "Europe/Berlin",
@@ -69,69 +85,6 @@ function dateShift(isoDate, days) {
   const d = new Date(`${isoDate}T12:00:00Z`);
   d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString().slice(0, 10);
-}
-
-function base64Url(input) {
-  let binary = "";
-  const bytes = input instanceof Uint8Array ? input : new TextEncoder().encode(input);
-  for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
-}
-
-function pemToArrayBuffer(pem) {
-  const clean = String(pem || "")
-    .replace(/\\n/g, "\n")
-    .replace(/-----BEGIN PRIVATE KEY-----/g, "")
-    .replace(/-----END PRIVATE KEY-----/g, "")
-    .replace(/\s+/g, "");
-  const binary = atob(clean);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
-  return bytes.buffer;
-}
-
-async function googleAccessToken(env) {
-  if (!env.GSC_CLIENT_EMAIL || !env.GSC_PRIVATE_KEY) {
-    throw new Error("Search Console credentials are not configured.");
-  }
-
-  const now = Math.floor(Date.now() / 1000);
-  const header = base64Url(JSON.stringify({ alg: "RS256", typ: "JWT" }));
-  const payload = base64Url(JSON.stringify({
-    iss: env.GSC_CLIENT_EMAIL,
-    scope: "https://www.googleapis.com/auth/webmasters.readonly",
-    aud: "https://oauth2.googleapis.com/token",
-    iat: now,
-    exp: now + 3600
-  }));
-  const unsigned = `${header}.${payload}`;
-  const key = await crypto.subtle.importKey(
-    "pkcs8",
-    pemToArrayBuffer(env.GSC_PRIVATE_KEY),
-    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-  const signature = await crypto.subtle.sign(
-    "RSASSA-PKCS1-v1_5",
-    key,
-    new TextEncoder().encode(unsigned)
-  );
-  const assertion = `${unsigned}.${base64Url(new Uint8Array(signature))}`;
-
-  const response = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "content-type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion
-    })
-  });
-  const data = await response.json();
-  if (!response.ok || !data.access_token) {
-    throw new Error(data.error_description || data.error || "Could not authenticate with Google.");
-  }
-  return data.access_token;
 }
 
 async function ensureSchema(db) {
@@ -184,7 +137,7 @@ async function ensureSeed(db) {
     .bind(PROJECT_ID).all();
   const ids = new Map((rows.results || []).map(row => [row.keyword_norm, Number(row.id)]));
 
-  for (const [keyword, source, position] of BASELINE) {
+  for (const [rankDate, keyword, source, position] of SEED) {
     const keywordId = ids.get(normalizeKeyword(keyword));
     if (!keywordId) continue;
     await db.prepare(`
@@ -194,10 +147,10 @@ async function ensureSeed(db) {
     `).bind(
       keywordId,
       source,
-      BASELINE_DATE,
-      `${BASELINE_DATE}T12:00:00.000Z`,
+      rankDate,
+      `${rankDate}T12:00:00.000Z`,
       position,
-      JSON.stringify({ origin: "manual_incognito_report" })
+      JSON.stringify({ origin: "manual_public_google_check" })
     ).run();
   }
 }
@@ -228,169 +181,63 @@ async function rankingData(db, projectId, days) {
   return {
     project_id: projectId,
     baseline_date: BASELINE_DATE,
+    today: berlinDate(),
+    mode: "manual_public_check",
     keywords: keywords.results || [],
     history: history.results || []
   };
 }
 
-async function collectGsc(db, env, keywords) {
-  if (!env.GSC_CLIENT_EMAIL || !env.GSC_PRIVATE_KEY) {
-    return { ok: false, skipped: true, error: "GSC credentials missing" };
-  }
-
-  const token = await googleAccessToken(env);
-  const property = env.GSC_PROPERTY || DEFAULT_PROPERTY;
-  const today = berlinDate();
-  const startDate = dateShift(today, -10);
-  const endDate = dateShift(today, -1);
-  const enabled = keywords.filter(k => Number(k.gsc_enabled) === 1);
-  const regex = `^(${enabled.map(k => escapeRegex(k.keyword)).join("|")})$`;
-  const endpoint = `https://searchconsole.googleapis.com/webmasters/v3/sites/${encodeURIComponent(property)}/searchAnalytics/query`;
-
-  const response = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      authorization: `Bearer ${token}`,
-      "content-type": "application/json"
-    },
-    body: JSON.stringify({
-      startDate,
-      endDate,
-      dimensions: ["date", "query"],
-      dimensionFilterGroups: [{
-        groupType: "and",
-        filters: [{ dimension: "query", operator: "includingRegex", expression: regex }]
-      }],
-      rowLimit: 25000,
-      dataState: "final"
-    })
-  });
-
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data?.error?.message || "Search Console request failed.");
-  }
-
-  const ids = new Map(enabled.map(k => [normalizeKeyword(k.keyword), Number(k.id)]));
-  let saved = 0;
-  for (const row of data.rows || []) {
-    const [rankDate, query] = row.keys || [];
-    const keywordId = ids.get(normalizeKeyword(query));
-    if (!keywordId || !rankDate) continue;
-    await db.prepare(`
-      INSERT INTO seo_rank_history
-        (keyword_id, source, rank_date, checked_at, position, clicks, impressions, ctr, metadata_json)
-      VALUES (?, 'gsc', ?, ?, ?, ?, ?, ?, ?)
-      ON CONFLICT(keyword_id, source, rank_date) DO UPDATE SET
-        checked_at = excluded.checked_at,
-        position = excluded.position,
-        clicks = excluded.clicks,
-        impressions = excluded.impressions,
-        ctr = excluded.ctr,
-        metadata_json = excluded.metadata_json
-    `).bind(
-      keywordId,
-      rankDate,
-      new Date().toISOString(),
-      Number(row.position),
-      Number(row.clicks || 0),
-      Number(row.impressions || 0),
-      Number(row.ctr || 0),
-      JSON.stringify({ property, source: "search_console_api" })
-    ).run();
-    saved += 1;
-  }
-
-  return { ok: true, saved, start_date: startDate, end_date: endDate };
-}
-
-function mapsMatch(result, env) {
-  const title = String(result?.title || "").toLocaleLowerCase("de-DE");
-  const website = String(result?.website || result?.links?.website || "").toLocaleLowerCase("de-DE");
-  const placeId = String(result?.place_id || result?.data_id || "");
-  const expectedPlace = String(env.MAPS_PLACE_ID || "").trim();
-  if (expectedPlace && placeId && placeId === expectedPlace) return true;
-  if (website.includes(MAPS_DOMAIN)) return true;
-  return title.includes(String(env.MAPS_MATCH_TEXT || MAPS_MATCH_TEXT).toLocaleLowerCase("de-DE"));
-}
-
-async function collectMaps(db, env, keywords) {
-  if (!env.SERPAPI_KEY) {
-    return { ok: false, skipped: true, error: "SERPAPI_KEY missing" };
-  }
-
-  const enabled = keywords.filter(k => Number(k.maps_enabled) === 1);
-  const rankDate = berlinDate();
-  let saved = 0;
-  const failures = [];
-
-  for (const keyword of enabled) {
-    try {
-      const url = new URL("https://serpapi.com/search.json");
-      url.searchParams.set("engine", "google_maps");
-      url.searchParams.set("type", "search");
-      url.searchParams.set("q", keyword.keyword);
-      url.searchParams.set("hl", "de");
-      url.searchParams.set("ll", env.MAPS_LL || "@50.1109,8.6821,13z");
-      url.searchParams.set("api_key", env.SERPAPI_KEY);
-
-      const response = await fetch(url.toString());
-      const data = await response.json();
-      if (!response.ok || data.error) throw new Error(data.error || "Maps request failed");
-
-      const results = Array.isArray(data.local_results) ? data.local_results : [];
-      const match = results.find(result => mapsMatch(result, env));
-      const position = match?.position == null ? null : Number(match.position);
-      const metadata = {
-        source: "serpapi_google_maps",
-        found: Boolean(match),
-        title: match?.title || null,
-        place_id: match?.place_id || match?.data_id || null
-      };
-
-      await db.prepare(`
-        INSERT INTO seo_rank_history
-          (keyword_id, source, rank_date, checked_at, position, metadata_json)
-        VALUES (?, 'maps', ?, ?, ?, ?)
-        ON CONFLICT(keyword_id, source, rank_date) DO UPDATE SET
-          checked_at = excluded.checked_at,
-          position = excluded.position,
-          metadata_json = excluded.metadata_json
-      `).bind(
-        Number(keyword.id),
-        rankDate,
-        new Date().toISOString(),
-        Number.isFinite(position) ? position : null,
-        JSON.stringify(metadata)
-      ).run();
-      saved += 1;
-    } catch (error) {
-      failures.push({ keyword: keyword.keyword, error: error.message || String(error) });
-    }
-  }
-
-  return { ok: failures.length === 0, saved, rank_date: rankDate, failures };
-}
-
-function canRead(request, env) {
+function isAuthorized(request, env) {
   if (!env.APP_PASSWORD) return true;
   return request.headers.get("x-app-password") === env.APP_PASSWORD;
 }
 
-function canCollect(request, env) {
-  const appOk = Boolean(env.APP_PASSWORD) && request.headers.get("x-app-password") === env.APP_PASSWORD;
-  const cronOk = Boolean(env.RANK_CRON_SECRET) && request.headers.get("x-rank-cron-secret") === env.RANK_CRON_SECRET;
-  return appOk || cronOk;
+function parsePosition(value) {
+  if (value === null || value === undefined || value === "" || String(value).toUpperCase() === "NA") return null;
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0 || n > 1000) throw new Error("Position must be a number between 1 and 1000, or NA.");
+  return n;
 }
 
-async function status(env) {
-  return {
-    gsc_configured: Boolean(env.GSC_CLIENT_EMAIL && env.GSC_PRIVATE_KEY),
-    gsc_property: env.GSC_PROPERTY || DEFAULT_PROPERTY,
-    maps_configured: Boolean(env.SERPAPI_KEY),
-    cron_configured: Boolean(env.RANK_CRON_SECRET),
-    maps_location: env.MAPS_LL || "@50.1109,8.6821,13z"
-  };
+async function saveManual(db, body) {
+  const rankDate = String(body?.rank_date || berlinDate());
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(rankDate)) return json({ error: "Invalid rank_date." }, 400);
+  const entries = Array.isArray(body?.entries) ? body.entries : [];
+  if (!entries.length) return json({ error: "No ranking entries supplied." }, 400);
+
+  const allowed = await db.prepare("SELECT id FROM seo_rank_keywords WHERE project_id = ?").bind(PROJECT_ID).all();
+  const allowedIds = new Set((allowed.results || []).map(row => Number(row.id)));
+  let saved = 0;
+
+  for (const entry of entries) {
+    const keywordId = Number(entry.keyword_id);
+    const source = String(entry.source || "");
+    if (!allowedIds.has(keywordId) || !["gsc", "maps"].includes(source)) continue;
+    let position;
+    try { position = parsePosition(entry.position); }
+    catch (error) { return json({ error: error.message }, 400); }
+
+    await db.prepare(`
+      INSERT INTO seo_rank_history
+        (keyword_id, source, rank_date, checked_at, position, metadata_json)
+      VALUES (?, ?, ?, ?, ?, ?)
+      ON CONFLICT(keyword_id, source, rank_date) DO UPDATE SET
+        checked_at = excluded.checked_at,
+        position = excluded.position,
+        metadata_json = excluded.metadata_json
+    `).bind(
+      keywordId,
+      source,
+      rankDate,
+      new Date().toISOString(),
+      position,
+      JSON.stringify({ origin: "manual_public_google_check" })
+    ).run();
+    saved += 1;
+  }
+
+  return json({ ok: true, saved, rank_date: rankDate });
 }
 
 export async function onRequest(context) {
@@ -399,6 +246,7 @@ export async function onRequest(context) {
     return new Response(null, { status: 204, headers: { allow: "GET, POST, OPTIONS" } });
   }
   if (!env.DB) return json({ error: "D1 binding 'DB' is not configured." }, 503);
+  if (!isAuthorized(request, env)) return json({ error: "Unauthorized" }, 401);
 
   const segments = getSegments(params);
   const first = segments[0] || "";
@@ -406,28 +254,17 @@ export async function onRequest(context) {
   try {
     await init(env.DB);
 
-    if (request.method === "POST" && first === "collect") {
-      if (!canCollect(request, env)) return json({ error: "Unauthorized" }, 401);
-      const rows = await env.DB.prepare(`
-        SELECT id, keyword, gsc_enabled, maps_enabled
-        FROM seo_rank_keywords
-        WHERE project_id = ?
-        ORDER BY sort_order ASC, id ASC
-      `).bind(PROJECT_ID).all();
-      const keywords = rows.results || [];
-      const result = { checked_at: new Date().toISOString() };
-      try { result.gsc = await collectGsc(env.DB, env, keywords); }
-      catch (error) { result.gsc = { ok: false, error: error.message || String(error) }; }
-      try { result.maps = await collectMaps(env.DB, env, keywords); }
-      catch (error) { result.maps = { ok: false, error: error.message || String(error) }; }
-      const ok = Boolean(result.gsc?.ok || result.maps?.ok);
-      return json({ ok, ...result }, ok ? 200 : 502);
+    if (request.method === "GET" && first === "status") {
+      return json({
+        mode: "manual_public_check",
+        automatic: false,
+        note: "Rankings are entered from manual public Google checks; no external API is required."
+      });
     }
 
-    if (!canRead(request, env)) return json({ error: "Unauthorized" }, 401);
-
-    if (request.method === "GET" && first === "status") {
-      return json(await status(env));
+    if (request.method === "POST" && first === "manual") {
+      const body = await request.json().catch(() => null);
+      return saveManual(env.DB, body);
     }
 
     if (request.method === "GET") {
@@ -442,6 +279,6 @@ export async function onRequest(context) {
     return json({ error: "Not found" }, 404);
   } catch (error) {
     console.error(error);
-    return json({ error: error.message || "Internal server error" }, error.status || 500);
+    return json({ error: error.message || "Internal server error" }, 500);
   }
 }
