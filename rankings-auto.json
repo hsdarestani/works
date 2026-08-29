@@ -1,6 +1,6 @@
 {
   "project_id": 201,
-  "generated_at": "2026-08-28T16:37:28.765Z",
+  "generated_at": "2026-08-29T11:04:52.902Z",
   "settings": {
     "locale": "de-DE",
     "timezone": "Europe/Berlin",
@@ -3430,6 +3430,196 @@
           "results_seen": 40
         }
       ]
+    },
+    {
+      "rank_date": "2026-08-29",
+      "checked_at": "2026-08-29T11:04:52.902Z",
+      "origin": "playwright_incognito_v2",
+      "ok": 5,
+      "not_found": 2,
+      "inconclusive": 3,
+      "blocked": 10,
+      "errors": 0,
+      "details": [
+        {
+          "keyword": "Botox Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "blocked",
+          "page_start": 0,
+          "blocked": true,
+          "url": "https://www.google.com/sorry/index?continue=https://www.google.de/search%3Fq%3DBotox%2BFrankfurt%26hl%3Dde%26gl%3Dde%26pws%3D0%26filter%3D0%26sei%3D1bySaqgTwIXDxw_3psDYBw&hl=de&q=EgRA7LFqGNX5ytQGIjC6TDnkcc26AHSxBk3sLTKNkYES5mdrDrbEyLyGNkKjEd005gWstXIs0UL4hgsusc4yAVJaAUM",
+          "excerpt": "uber diese seite unsere systeme haben ungewohnlichen datenverkehr aus ihrem computernetzwerk festgestellt. diese seite uberpruft, ob die anfragen wirklich von ihnen und nicht von einem robot gesendet werden. warum? ip-adresse: 64.236.177.106 uhrzeit: 2026-08-29t11:04:53z url: https://www.google.de/search?q=botox+frankfurt&hl=de&gl=de&pws=0&filter=0&sei=1bysaqgtwixdxw_3psdybw"
+        },
+        {
+          "keyword": "Botox Frankfurt",
+          "source": "maps",
+          "position": 20,
+          "status": "ok",
+          "matched_text": "A+ Esthetic / Zentrum für Ästhetik · A+ Esthetic / Zentrum für Ästhetik · 5,0",
+          "results_seen": 59
+        },
+        {
+          "keyword": "Masseter Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "blocked",
+          "page_start": 0,
+          "blocked": true,
+          "url": "https://www.google.com/sorry/index?continue=https://www.google.de/search%3Fq%3DMasseter%2BFrankfurt%26hl%3Dde%26gl%3Dde%26pws%3D0%26filter%3D0%26sei%3D47ySaqWxLdHaptQPhsOx8As&hl=de&q=EgRA7LFqGOP5ytQGIjC44cIiHK4FAcxFQV8kkYdQVFmwiW2ThW-rB9h_e6jxflTD0TOMZF-d9mJHA8d0rrEyAVJaAUM",
+          "excerpt": "uber diese seite unsere systeme haben ungewohnlichen datenverkehr aus ihrem computernetzwerk festgestellt. diese seite uberpruft, ob die anfragen wirklich von ihnen und nicht von einem robot gesendet werden. warum? ip-adresse: 64.236.177.106 uhrzeit: 2026-08-29t11:05:08z url: https://www.google.de/search?q=masseter+frankfurt&hl=de&gl=de&pws=0&filter=0&sei=47ysaqwxldhaptqphsox8as"
+        },
+        {
+          "keyword": "Masseter Frankfurt",
+          "source": "maps",
+          "position": 12,
+          "status": "ok",
+          "matched_text": "A+ Esthetic / Zentrum für Ästhetik · A+ Esthetic / Zentrum für Ästhetik · 5,0",
+          "results_seen": 37
+        },
+        {
+          "keyword": "Vitamin Infusion Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "blocked",
+          "page_start": 0,
+          "blocked": true,
+          "url": "https://www.google.com/sorry/index?continue=https://www.google.de/search%3Fq%3DVitamin%2BInfusion%2BFrankfurt%26hl%3Dde%26gl%3Dde%26pws%3D0%26filter%3D0%26sei%3D8bySar6UEIGKptQPg7DSyQg&hl=de&q=EgRA7LFqGPH5ytQGIjAb9CaaCVjRzvq3qDLSXksm8MYa0REeWVXLmTcFM65kcud-D1KCFgz4vxjZFRDgM2EyAVJaAUM",
+          "excerpt": "uber diese seite unsere systeme haben ungewohnlichen datenverkehr aus ihrem computernetzwerk festgestellt. diese seite uberpruft, ob die anfragen wirklich von ihnen und nicht von einem robot gesendet werden. warum? ip-adresse: 64.236.177.106 uhrzeit: 2026-08-29t11:05:21z url: https://www.google.de/search?q=vitamin+infusion+frankfurt&hl=de&gl=de&pws=0&filter=0&sei=8bysar6ueigkptqpg7dsyqg"
+        },
+        {
+          "keyword": "Vitamin Infusion Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "inconclusive",
+          "results_seen": 9,
+          "reason": "Too few Maps results loaded to assert not_found safely"
+        },
+        {
+          "keyword": "Filler Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "blocked",
+          "page_start": 0,
+          "blocked": true,
+          "url": "https://www.google.com/sorry/index?continue=https://www.google.de/search%3Fq%3DFiller%2BFrankfurt%26hl%3Dde%26gl%3Dde%26pws%3D0%26filter%3D0%26sei%3D-rySasCrBKmxw8cPoYeUoQY&hl=de&q=EgRA7LFqGPr5ytQGIjBDYxGvq6TQxxw4W-okrIkTxMySSBKGAb7nj6tQvbyEIVSzdjc3eSUyqwHz1JzmvTcyAVJaAUM",
+          "excerpt": "uber diese seite unsere systeme haben ungewohnlichen datenverkehr aus ihrem computernetzwerk festgestellt. diese seite uberpruft, ob die anfragen wirklich von ihnen und nicht von einem robot gesendet werden. warum? ip-adresse: 64.236.177.106 uhrzeit: 2026-08-29t11:05:30z url: https://www.google.de/search?q=filler+frankfurt&hl=de&gl=de&pws=0&filter=0&sei=-rysascrbkmxw8cpoyeuoqy"
+        },
+        {
+          "keyword": "Filler Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "inconclusive",
+          "results_seen": 26,
+          "reason": "Too few Maps results loaded to assert not_found safely"
+        },
+        {
+          "keyword": "Fett weg Spritze Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "blocked",
+          "page_start": 0,
+          "blocked": true,
+          "url": "https://www.google.com/sorry/index?continue=https://www.google.de/search%3Fq%3DFett%2Bweg%2BSpritze%2BFrankfurt%26hl%3Dde%26gl%3Dde%26pws%3D0%26filter%3D0%26sei%3DBb2SauvnL4KeptQPjeeokQc&hl=de&q=EgRA7LFqGIX6ytQGIjChhokQL8Ir6SeWVDN9FwLqbBcbIj3-Cszmbj2HW2Lmkzm3R1Tk4ORoCm7qAGieeMkyAVJaAUM",
+          "excerpt": "uber diese seite unsere systeme haben ungewohnlichen datenverkehr aus ihrem computernetzwerk festgestellt. diese seite uberpruft, ob die anfragen wirklich von ihnen und nicht von einem robot gesendet werden. warum? ip-adresse: 64.236.177.106 uhrzeit: 2026-08-29t11:05:42z url: https://www.google.de/search?q=fett+weg+spritze+frankfurt&hl=de&gl=de&pws=0&filter=0&sei=bb2sauvnl4keptqpjeeokqc"
+        },
+        {
+          "keyword": "Fett weg Spritze Frankfurt",
+          "source": "maps",
+          "position": 16,
+          "status": "ok",
+          "matched_text": "A+ Esthetic / Zentrum für Ästhetik · A+ Esthetic / Zentrum für Ästhetik · 5,0",
+          "results_seen": 54
+        },
+        {
+          "keyword": "Skinbooster Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "blocked",
+          "page_start": 0,
+          "blocked": true,
+          "url": "https://www.google.com/sorry/index?continue=https://www.google.de/search%3Fq%3DSkinbooster%2BFrankfurt%26hl%3Dde%26gl%3Dde%26pws%3D0%26filter%3D0%26sei%3DFb2SatGwDoW3ptQPosmE-Qo&hl=de&q=EgRA7LFqGJX6ytQGIjAy8cB7H0YU5bevaQnRKlXu6NnJK4URSK144H-yXfCX2VJa25_jep6cqEiKJUS85goyAVJaAUM",
+          "excerpt": "uber diese seite unsere systeme haben ungewohnlichen datenverkehr aus ihrem computernetzwerk festgestellt. diese seite uberpruft, ob die anfragen wirklich von ihnen und nicht von einem robot gesendet werden. warum? ip-adresse: 64.236.177.106 uhrzeit: 2026-08-29t11:05:57z url: https://www.google.de/search?q=skinbooster+frankfurt&hl=de&gl=de&pws=0&filter=0&sei=fb2satgwdow3ptqposme-qo"
+        },
+        {
+          "keyword": "Skinbooster Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "inconclusive",
+          "results_seen": 8,
+          "reason": "Too few Maps results loaded to assert not_found safely"
+        },
+        {
+          "keyword": "Haarentfernung Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "blocked",
+          "page_start": 0,
+          "blocked": true,
+          "url": "https://www.google.com/sorry/index?continue=https://www.google.de/search%3Fq%3DHaarentfernung%2BFrankfurt%26hl%3Dde%26gl%3Dde%26pws%3D0%26filter%3D0%26sei%3DHb2SasGWPK6lptQPraW7uQE&hl=de&q=EgRA7LFqGJ76ytQGIjCiH8D_JuCLBZTuPoQd-baeidFNEPZxzo82G-qTUHnWf14Y8txJ48ek704Gt0CuWGYyAVJaAUM",
+          "excerpt": "uber diese seite unsere systeme haben ungewohnlichen datenverkehr aus ihrem computernetzwerk festgestellt. diese seite uberpruft, ob die anfragen wirklich von ihnen und nicht von einem robot gesendet werden. warum? ip-adresse: 64.236.177.106 uhrzeit: 2026-08-29t11:06:06z url: https://www.google.de/search?q=haarentfernung+frankfurt&hl=de&gl=de&pws=0&filter=0&sei=hb2sasgwpk6lptqpraw7uqe"
+        },
+        {
+          "keyword": "Haarentfernung Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "not_found",
+          "results_seen": 60
+        },
+        {
+          "keyword": "Dauerhafte Haarentfernung Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "blocked",
+          "page_start": 0,
+          "blocked": true,
+          "url": "https://www.google.com/sorry/index?continue=https://www.google.de/search%3Fq%3DDauerhafte%2BHaarentfernung%2BFrankfurt%26hl%3Dde%26gl%3Dde%26pws%3D0%26filter%3D0%26sei%3DLL2SasaKGf2sw8cPurbmyAM&hl=de&q=EgRA7LFqGKz6ytQGIjBGD1LSeCFJdCi3mJLXjSfMcxgblZ5SIlmJARJtaRmYp7tj6vtAyH9AkWJVokQFooAyAVJaAUM",
+          "excerpt": "uber diese seite unsere systeme haben ungewohnlichen datenverkehr aus ihrem computernetzwerk festgestellt. diese seite uberpruft, ob die anfragen wirklich von ihnen und nicht von einem robot gesendet werden. warum? ip-adresse: 64.236.177.106 uhrzeit: 2026-08-29t11:06:20z url: https://www.google.de/search?q=dauerhafte+haarentfernung+frankfurt&hl=de&gl=de&pws=0&filter=0&sei=ll2sasakgf2sw8cpurbmyam"
+        },
+        {
+          "keyword": "Dauerhafte Haarentfernung Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "not_found",
+          "results_seen": 60
+        },
+        {
+          "keyword": "PRP Behandlung Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "blocked",
+          "page_start": 0,
+          "blocked": true,
+          "url": "https://www.google.com/sorry/index?continue=https://www.google.de/search%3Fq%3DPRP%2BBehandlung%2BFrankfurt%26hl%3Dde%26gl%3Dde%26pws%3D0%26filter%3D0%26sei%3DOr2Sav2bOsH_ptQP_uKrgQM&hl=de&q=EgRA7LFqGLv6ytQGIjAG_-u0Z5adP8EMbdLRGKEClBGs-W-PAqeS_qKaYl0jUNAvogJ70lwevKzDcpeugpwyAVJaAUM",
+          "excerpt": "uber diese seite unsere systeme haben ungewohnlichen datenverkehr aus ihrem computernetzwerk festgestellt. diese seite uberpruft, ob die anfragen wirklich von ihnen und nicht von einem robot gesendet werden. warum? ip-adresse: 64.236.177.106 uhrzeit: 2026-08-29t11:06:35z url: https://www.google.de/search?q=prp+behandlung+frankfurt&hl=de&gl=de&pws=0&filter=0&sei=or2sav2bosh_ptqp_ukrgqm"
+        },
+        {
+          "keyword": "PRP Behandlung Frankfurt",
+          "source": "maps",
+          "position": 20,
+          "status": "ok",
+          "matched_text": "A+ Esthetic / Zentrum für Ästhetik · A+ Esthetic / Zentrum für Ästhetik · 5,0",
+          "results_seen": 27
+        },
+        {
+          "keyword": "Masseter Botox Frankfurt",
+          "source": "gsc",
+          "position": null,
+          "status": "blocked",
+          "page_start": 0,
+          "blocked": true,
+          "url": "https://www.google.com/sorry/index?continue=https://www.google.de/search%3Fq%3DMasseter%2BBotox%2BFrankfurt%26hl%3Dde%26gl%3Dde%26pws%3D0%26filter%3D0%26sei%3DRr2Sas70JYWhw8cPqNb7qA4&hl=de&q=EgRA7LFqGMb6ytQGIjCHV5yz7D_pynNH7vnC_kH67483n3UvBDqXXBhEsPP0KCoT7Qq38aRboM76hGvqzFkyAVJaAUM",
+          "excerpt": "uber diese seite unsere systeme haben ungewohnlichen datenverkehr aus ihrem computernetzwerk festgestellt. diese seite uberpruft, ob die anfragen wirklich von ihnen und nicht von einem robot gesendet werden. warum? ip-adresse: 64.236.177.106 uhrzeit: 2026-08-29t11:06:47z url: https://www.google.de/search?q=masseter+botox+frankfurt&hl=de&gl=de&pws=0&filter=0&sei=rr2sas70jywhw8cpqnb7qa4"
+        },
+        {
+          "keyword": "Masseter Botox Frankfurt",
+          "source": "maps",
+          "position": 20,
+          "status": "ok",
+          "matched_text": "A+ Esthetic / Zentrum für Ästhetik · A+ Esthetic / Zentrum für Ästhetik · 5,0",
+          "results_seen": 38
+        }
+      ]
     }
   ],
   "snapshots": [
@@ -5099,6 +5289,95 @@
             "status": "ok",
             "matched_text": "A+ Esthetic / Zentrum für Ästhetik ·   · A+ Esthetic / Zentrum für Ästhetik",
             "results_seen": 40
+          }
+        }
+      ]
+    },
+    {
+      "rank_date": "2026-08-29",
+      "checked_at": "2026-08-29T11:04:52.902Z",
+      "origin": "playwright_incognito_v2",
+      "entries": [
+        {
+          "keyword": "Botox Frankfurt",
+          "source": "maps",
+          "position": 20,
+          "status": "ok",
+          "metadata": {
+            "position": 20,
+            "status": "ok",
+            "matched_text": "A+ Esthetic / Zentrum für Ästhetik · A+ Esthetic / Zentrum für Ästhetik · 5,0",
+            "results_seen": 59
+          }
+        },
+        {
+          "keyword": "Masseter Frankfurt",
+          "source": "maps",
+          "position": 12,
+          "status": "ok",
+          "metadata": {
+            "position": 12,
+            "status": "ok",
+            "matched_text": "A+ Esthetic / Zentrum für Ästhetik · A+ Esthetic / Zentrum für Ästhetik · 5,0",
+            "results_seen": 37
+          }
+        },
+        {
+          "keyword": "Fett weg Spritze Frankfurt",
+          "source": "maps",
+          "position": 16,
+          "status": "ok",
+          "metadata": {
+            "position": 16,
+            "status": "ok",
+            "matched_text": "A+ Esthetic / Zentrum für Ästhetik · A+ Esthetic / Zentrum für Ästhetik · 5,0",
+            "results_seen": 54
+          }
+        },
+        {
+          "keyword": "Haarentfernung Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "not_found",
+          "metadata": {
+            "position": null,
+            "status": "not_found",
+            "results_seen": 60
+          }
+        },
+        {
+          "keyword": "Dauerhafte Haarentfernung Frankfurt",
+          "source": "maps",
+          "position": null,
+          "status": "not_found",
+          "metadata": {
+            "position": null,
+            "status": "not_found",
+            "results_seen": 60
+          }
+        },
+        {
+          "keyword": "PRP Behandlung Frankfurt",
+          "source": "maps",
+          "position": 20,
+          "status": "ok",
+          "metadata": {
+            "position": 20,
+            "status": "ok",
+            "matched_text": "A+ Esthetic / Zentrum für Ästhetik · A+ Esthetic / Zentrum für Ästhetik · 5,0",
+            "results_seen": 27
+          }
+        },
+        {
+          "keyword": "Masseter Botox Frankfurt",
+          "source": "maps",
+          "position": 20,
+          "status": "ok",
+          "metadata": {
+            "position": 20,
+            "status": "ok",
+            "matched_text": "A+ Esthetic / Zentrum für Ästhetik · A+ Esthetic / Zentrum für Ästhetik · 5,0",
+            "results_seen": 38
           }
         }
       ]
